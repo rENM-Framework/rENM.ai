@@ -23,15 +23,15 @@ Responses API and code-interpreter tool. Default is \code{"gpt-5.1"}.}
 \value{
 List (invisible) with components
 \itemize{
-\item \code{response} – parsed JSON response from the API.
-\item \code{docx_path} – file path of the DOCX report, or
+\item \code{response} - parsed JSON response from the API.
+\item \code{docx_path} - file path of the DOCX report, or
 \code{NA} if not found.
-\item \code{pdf_path} – file path of the PDF report, or
+\item \code{pdf_path} - file path of the PDF report, or
 \code{NA} if not found.
-\item \code{elapsed_sec} – total elapsed time in seconds.
+\item \code{elapsed_sec} - total elapsed time in seconds.
 \item \code{input_tokens}, \code{output_tokens},
-\code{total_tokens} – approximate token counts.
-\item \code{est_total_cost} – approximate cost in USD.
+\code{total_tokens} - approximate token counts.
+\item \code{est_total_cost} - approximate cost in USD.
 }
 }
 \description{
@@ -60,6 +60,17 @@ container.
 \itemize{
 \item Prompt file containing the placeholder string \code{<alpha_code>}.
 \item Zipped bundle of raster and tabular data required by the prompt.
+}
+
+\strong{Authentication}
+\itemize{
+\item Uses \code{api_key}, defaulting to
+\code{Sys.getenv("OPENAI_API_KEY")}.
+\item Leading and trailing whitespace are removed from the API key
+before use.
+\item If present, \code{OPENAI_ORG_ID} and \code{OPENAI_PROJECT_ID}
+are added as request headers to support explicit organization
+or project routing.
 }
 
 \strong{Directory layout under \code{rENM_project_dir()}}

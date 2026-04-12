@@ -27,6 +27,17 @@
 #'   \item Zipped bundle of raster and tabular data required by the prompt.
 #' }
 #'
+#' \strong{Authentication}
+#' \itemize{
+#'   \item Uses \code{api_key}, defaulting to
+#'         \code{Sys.getenv("OPENAI_API_KEY")}.
+#'   \item Leading and trailing whitespace are removed from the API key
+#'         before use.
+#'   \item If present, \code{OPENAI_ORG_ID} and \code{OPENAI_PROJECT_ID}
+#'         are added as request headers to support explicit organization
+#'         or project routing.
+#' }
+#'
 #' \strong{Directory layout under \code{rENM_project_dir()}}
 #' \preformatted{
 #' <project_dir>/runs/CASP/Summaries/chatgpt/suitability_package.zip
@@ -71,21 +82,21 @@
 #'
 #' @return List (invisible) with components
 #' \itemize{
-#'   \item \code{response} – parsed JSON response from the API.
-#'   \item \code{docx_path} – file path of the DOCX report, or
+#'   \item \code{response} - parsed JSON response from the API.
+#'   \item \code{docx_path} - file path of the DOCX report, or
 #'         \code{NA} if not found.
-#'   \item \code{pdf_path} – file path of the PDF report, or
+#'   \item \code{pdf_path} - file path of the PDF report, or
 #'         \code{NA} if not found.
-#'   \item \code{elapsed_sec} – total elapsed time in seconds.
+#'   \item \code{elapsed_sec} - total elapsed time in seconds.
 #'   \item \code{input_tokens}, \code{output_tokens},
-#'         \code{total_tokens} – approximate token counts.
-#'   \item \code{est_total_cost} – approximate cost in USD.
+#'         \code{total_tokens} - approximate token counts.
+#'   \item \code{est_total_cost} - approximate cost in USD.
 #' }
 #'
 #' @importFrom curl form_file
 #' @importFrom httr2 request req_auth_bearer_token req_body_multipart
-#' @importFrom httr2 req_body_json req_perform resp_status
-#' @importFrom httr2 resp_body_string resp_body_json resp_body_raw
+#' @importFrom httr2 req_body_json req_perform resp_status req_headers
+#' @importFrom httr2 resp_body_string resp_body_json resp_body_raw req_error
 #'
 #' @examples
 #' \dontrun{
@@ -113,8 +124,21 @@ submit_suitability_ai_package <- function(
   # Safe "x %||% y" helper (local to this function)
   `%||%` <- function(x, y) if (is.null(x)) y else x
 
-  if (identical(api_key, "") || is.na(api_key)) {
-    stop("OPENAI_API_KEY is not set.")
+  # Normalize and validate authentication inputs
+  api_key <- trimws(api_key)
+
+  if (is.na(api_key) || !nzchar(api_key)) {
+    stop("OPENAI_API_KEY is not set.", call. = FALSE)
+  }
+
+  openai_org_id     <- trimws(Sys.getenv("OPENAI_ORG_ID"))
+  openai_project_id <- trimws(Sys.getenv("OPENAI_PROJECT_ID"))
+
+  if (identical(openai_org_id, "")) {
+    openai_org_id <- NULL
+  }
+  if (identical(openai_project_id, "")) {
+    openai_project_id <- NULL
   }
 
   message("=== submit_suitability_ai_package(): Starting for alpha_code = ",
@@ -133,10 +157,10 @@ submit_suitability_ai_package <- function(
                                        "suitability_prompt.txt"))
 
   if (!file.exists(zip_path)) {
-    stop("Zip file not found: ", zip_path)
+    stop("Zip file not found: ", zip_path, call. = FALSE)
   }
   if (!file.exists(prompt_path)) {
-    stop("Prompt file not found: ", prompt_path)
+    stop("Prompt file not found: ", prompt_path, call. = FALSE)
   }
 
   out_base_dir <- path.expand(file.path(species_dir, "Summaries", "pages"))
@@ -153,6 +177,58 @@ submit_suitability_ai_package <- function(
   message("DOCX out  : ", docx_path)
   message("PDF out   : ", pdf_path)
 
+  # ---- Helper: apply optional org/project headers ---------------------------
+  add_openai_context_headers <- function(req) {
+    hdrs <- list()
+
+    if (!is.null(openai_org_id)) {
+      hdrs[["OpenAI-Organization"]] <- openai_org_id
+    }
+    if (!is.null(openai_project_id)) {
+      hdrs[["OpenAI-Project"]] <- openai_project_id
+    }
+
+    if (length(hdrs)) {
+      req <- do.call(httr2::req_headers, c(list(req), hdrs))
+    }
+
+    req
+  }
+
+  # ---- Helper: perform request without automatic HTTP error throw ----------
+  perform_openai_request <- function(req, what) {
+    req <- httr2::req_error(req, is_error = function(resp) FALSE)
+
+    resp <- tryCatch(
+      httr2::req_perform(req),
+      error = function(e) {
+        stop(
+          sprintf("%s request failed before a valid HTTP response was processed: %s",
+                  what, conditionMessage(e)),
+          call. = FALSE
+        )
+      }
+    )
+
+    status <- httr2::resp_status(resp)
+
+    if (status >= 300) {
+      body_txt <- tryCatch(
+        httr2::resp_body_string(resp),
+        error = function(e) {
+          paste0("<unable to read response body: ", conditionMessage(e), ">")
+        }
+      )
+
+      stop(
+        sprintf("%s failed [%s].\n%s", what, status, body_txt),
+        call. = FALSE
+      )
+    }
+
+    resp
+  }
+
   # ---- 1. Read prompt and substitute <alpha_code> ---------------------------
   message("Reading and preparing prompt text...")
   prompt_raw <- paste(readLines(prompt_path, warn = FALSE), collapse = "\n")
@@ -165,21 +241,25 @@ submit_suitability_ai_package <- function(
 
   req_upload <- httr2::request("https://api.openai.com/v1/files") |>
     httr2::req_auth_bearer_token(api_key) |>
+    add_openai_context_headers() |>
     httr2::req_body_multipart(
       purpose = "user_data",
       file    = curl::form_file(zip_path)
     )
 
-  resp_upload <- httr2::req_perform(req_upload)
-
-  if (httr2::resp_status(resp_upload) >= 300) {
-    stop("File upload failed: ",
-         httr2::resp_status(resp_upload), "\n",
-         httr2::resp_body_string(resp_upload))
-  }
+  resp_upload <- perform_openai_request(
+    req_upload,
+    "OpenAI Files API upload"
+  )
 
   file_info      <- httr2::resp_body_json(resp_upload)
-  bundle_file_id <- file_info$id
+  bundle_file_id <- file_info$id %||% NULL
+
+  if (is.null(bundle_file_id) || !nzchar(bundle_file_id)) {
+    stop("File upload succeeded, but no file ID was returned.",
+         call. = FALSE)
+  }
+
   message("Uploaded bundle file_id: ", bundle_file_id)
 
   # ---- 3. Call /v1/responses with code_interpreter --------------------------
@@ -216,18 +296,16 @@ submit_suitability_ai_package <- function(
 
   req_resp <- httr2::request("https://api.openai.com/v1/responses") |>
     httr2::req_auth_bearer_token(api_key) |>
+    add_openai_context_headers() |>
     httr2::req_body_json(body)
 
-  resp <- httr2::req_perform(req_resp)
+  resp <- perform_openai_request(
+    req_resp,
+    "OpenAI Responses API call"
+  )
 
   end_time    <- Sys.time()
   elapsed_sec <- as.numeric(difftime(end_time, start_time, units = "secs"))
-
-  if (httr2::resp_status(resp) >= 300) {
-    stop("Responses API call failed: ",
-         httr2::resp_status(resp), "\n",
-         httr2::resp_body_string(resp))
-  }
 
   resp_json <- httr2::resp_body_json(resp)
   message("Responses API call completed in ",
@@ -245,10 +323,18 @@ submit_suitability_ai_package <- function(
   price_out_per_1M <- 10.00  # USD per 1M output tokens
   cost_tool        <- 0.03   # USD per code interpreter session (flat)
 
-  cost_input  <- if (!is.na(input_tokens))
-    input_tokens * price_in_per_1M / 1e6 else NA_real_
-  cost_output <- if (!is.na(output_tokens))
-    output_tokens * price_out_per_1M / 1e6 else NA_real_
+  cost_input  <- if (!is.na(input_tokens)) {
+    input_tokens * price_in_per_1M / 1e6
+  } else {
+    NA_real_
+  }
+
+  cost_output <- if (!is.na(output_tokens)) {
+    output_tokens * price_out_per_1M / 1e6
+  } else {
+    NA_real_
+  }
+
   est_total_cost <- sum(cost_input, cost_output, cost_tool, na.rm = TRUE)
 
   message("Token usage (approx):")
@@ -321,13 +407,21 @@ submit_suitability_ai_package <- function(
     req_list <- httr2::request(
       paste0("https://api.openai.com/v1/containers/", cid, "/files")
     ) |>
-      httr2::req_auth_bearer_token(api_key)
+      httr2::req_auth_bearer_token(api_key) |>
+      add_openai_context_headers()
 
-    resp_list <- httr2::req_perform(req_list)
-    if (httr2::resp_status(resp_list) >= 300) {
-      warning("Listing files failed for container ", cid, ": ",
-              httr2::resp_status(resp_list), "\n",
-              httr2::resp_body_string(resp_list))
+    resp_list <- tryCatch(
+      perform_openai_request(
+        req_list,
+        paste0("Listing files for container ", cid)
+      ),
+      error = function(e) {
+        warning(conditionMessage(e), call. = FALSE)
+        return(NULL)
+      }
+    )
+
+    if (is.null(resp_list)) {
       next
     }
 
@@ -351,15 +445,22 @@ submit_suitability_ai_package <- function(
           paste0("https://api.openai.com/v1/containers/", cid,
                  "/files/", file_id, "/content")
         ) |>
-          httr2::req_auth_bearer_token(api_key)
+          httr2::req_auth_bearer_token(api_key) |>
+          add_openai_context_headers()
 
-        resp_file <- httr2::req_perform(req_file)
-        if (httr2::resp_status(resp_file) >= 300) {
-          warning("Downloading DOCX failed for container ", cid,
-                  ", file ", file_id, ": ",
-                  httr2::resp_status(resp_file), "\n",
-                  httr2::resp_body_string(resp_file))
-        } else {
+        resp_file <- tryCatch(
+          perform_openai_request(
+            req_file,
+            paste0("Downloading DOCX from container ", cid,
+                   ", file ", file_id)
+          ),
+          error = function(e) {
+            warning(conditionMessage(e), call. = FALSE)
+            return(NULL)
+          }
+        )
+
+        if (!is.null(resp_file)) {
           raw <- httr2::resp_body_raw(resp_file)
           writeBin(raw, docx_path)
           message("Saved DOCX report to: ", docx_path)
@@ -377,15 +478,22 @@ submit_suitability_ai_package <- function(
           paste0("https://api.openai.com/v1/containers/", cid,
                  "/files/", file_id, "/content")
         ) |>
-          httr2::req_auth_bearer_token(api_key)
+          httr2::req_auth_bearer_token(api_key) |>
+          add_openai_context_headers()
 
-        resp_file <- httr2::req_perform(req_file)
-        if (httr2::resp_status(resp_file) >= 300) {
-          warning("Downloading PDF failed for container ", cid,
-                  ", file ", file_id, ": ",
-                  httr2::resp_status(resp_file), "\n",
-                  httr2::resp_body_string(resp_file))
-        } else {
+        resp_file <- tryCatch(
+          perform_openai_request(
+            req_file,
+            paste0("Downloading PDF from container ", cid,
+                   ", file ", file_id)
+          ),
+          error = function(e) {
+            warning(conditionMessage(e), call. = FALSE)
+            return(NULL)
+          }
+        )
+
+        if (!is.null(resp_file)) {
           raw <- httr2::resp_body_raw(resp_file)
           writeBin(raw, pdf_path)
           message("Saved PDF report to: ", pdf_path)
@@ -478,17 +586,35 @@ submit_suitability_ai_package <- function(
   )
   if (identical(outputs_saved, "")) outputs_saved <- "None"
 
-  output_file <- if (!is.na(docx_path_final))
-    docx_path_final else "None"
+  output_file <- if (!is.na(docx_path_final)) {
+    docx_path_final
+  } else {
+    "None"
+  }
 
-  input_tokens_str  <- if (is.na(input_tokens))
-    "NA" else as.character(input_tokens)
-  output_tokens_str <- if (is.na(output_tokens))
-    "NA" else as.character(output_tokens)
-  total_tokens_str  <- if (is.na(total_tokens))
-    "NA" else as.character(total_tokens)
-  cost_str          <- if (is.na(est_total_cost))
-    "NA" else sprintf("$%.6f", est_total_cost)
+  input_tokens_str  <- if (is.na(input_tokens)) {
+    "NA"
+  } else {
+    as.character(input_tokens)
+  }
+
+  output_tokens_str <- if (is.na(output_tokens)) {
+    "NA"
+  } else {
+    as.character(output_tokens)
+  }
+
+  total_tokens_str  <- if (is.na(total_tokens)) {
+    "NA"
+  } else {
+    as.character(total_tokens)
+  }
+
+  cost_str <- if (is.na(est_total_cost)) {
+    "NA"
+  } else {
+    sprintf("$%.6f", est_total_cost)
+  }
 
   log_lines <- c(
     sep_line,
