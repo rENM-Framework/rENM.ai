@@ -150,7 +150,7 @@ assemble_ai_package <- function(
   prompt_src  <- system.file(
     "chatgpt",
     "suitability_prompt.txt",
-    package = "rENM.dev"   # this need to point to correct package
+    package = "rENM.ai"   # this need to point to correct package
   )
   prompt_dest <- file.path(alpha_chatgpt_dir, "suitability_prompt.txt")
 
