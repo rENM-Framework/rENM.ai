@@ -1,4 +1,4 @@
-#' Render suitability-trend DOCX report to PDF and record processing summary
+#' Render GenAI DOCX report to PDF
 #'
 #' Converts a species-specific DOCX report into PDF and appends a processing
 #' summary to the run log.
@@ -46,7 +46,7 @@
 #' }
 #'
 #' @export
-render_ai_docs <- function(alpha_code, verbose = TRUE) {
+render_ai_docx <- function(alpha_code, verbose = TRUE) {
 
   # -------------------------------------------------------------
   # 1. Normalize

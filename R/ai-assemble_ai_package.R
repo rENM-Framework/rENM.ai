@@ -1,8 +1,8 @@
 #' Assemble GenAI suitability package for a species
 #'
-#' Collects suitability-trend rasters, summary tables, and species metadata for
-#' a single species, then builds an AI-ready package together with a prompt
-#' template and log entry.  The function locates the project root via
+#' Collects selected suitability-trend rasters, summary tables, and species
+#' metadata for a single species, then builds an AI-ready package together
+#' with a prompt template and log entry.  The function locates the project root via
 #' \code{rENM_project_dir()} and no longer relies on hard-coded paths.
 #'
 #' @details
@@ -10,9 +10,18 @@
 #' and operates within the project directory structure defined by
 #' rENM_project_dir().
 #'
+#' \strong{Key update}
+#' \itemize{
+#'   \item Adds flexible file selection via \code{files}.
+#'   \item All files are drawn from subdirectories under \code{Trends/}.
+#'   \item Users must explicitly specify subdirectories (e.g.,
+#'         \code{"suitability/Suitability-Trend.tif"} or
+#'         \code{"centroids/Bioclimatic-Velocity.csv"}).
+#' }
+#'
 #' \strong{Pipeline context}
 #' \itemize{
-#'   \item Copies pre-computed suitability rasters and tables into
+#'   \item Copies selected suitability rasters and tables into
 #'         \code{suitability_package/}.
 #'   \item Copies \code{\_species.csv} to a species-specific file and
 #'         includes it in the package.
@@ -22,57 +31,20 @@
 #'         package = "rENM.ai")} into the species \code{chatgpt/} directory.
 #'   \item Appends a standardized processing-summary block to
 #'         \code{\_log.txt}.
-#'   \item Eliminates hard-coded home-directory paths by relying on
-#'         \code{rENM_project_dir()}.
 #' }
-#'
-#' \strong{Directory layout}
-#' \itemize{
-#'   \item \code{<project_root>/runs/<alpha_code>/Trends/suitability/}
-#'   \item \code{<project_root>/runs/<alpha_code>/Summaries/chatgpt/}
-#'   \item \code{<project_root>/data/_species.csv}
-#' }
-#'
-#' \strong{Expected inputs}
-#' \itemize{
-#'   \item \code{<project_root>/runs/<alpha_code>/Trends/suitability/}
-#'         \code{<alpha_code>-Suitability-Change-Trend.tif}
-#'   \item \code{<project_root>/runs/<alpha_code>/Trends/suitability/}
-#'         \code{<alpha_code>-Suitability-Trend-GAP-Range-Percentages.csv}
-#'   \item \code{<project_root>/runs/<alpha_code>/Trends/suitability/}
-#'         \code{<alpha_code>-Suitability-Trend-Percentages.csv}
-#'   \item \code{<project_root>/runs/<alpha_code>/Trends/suitability/}
-#'         \code{<alpha_code>-Suitability-Trend-State-Analysis-Hotspots-Stats.csv}
-#'   \item \code{<project_root>/runs/<alpha_code>/Trends/suitability/}
-#'         \code{<alpha_code>-Suitability-Trend-State-Analysis-Summary.csv}
-#'   \item \code{<project_root>/runs/<alpha_code>/Trends/suitability/}
-#'         \code{<alpha_code>-Suitability-Trend-State-Analysis.csv}
-#'   \item \code{<project_root>/runs/<alpha_code>/Trends/suitability/}
-#'         \code{<alpha_code>-Suitability-Trend.tif}
-#'   \item \code{<project_root>/data/_species.csv}
-#' }
-#'
-#' The shared species table is copied to
-#' \code{<project_root>/runs/<alpha_code>/Trends/suitability/}
-#' \code{<alpha_code>-Species-Information.csv} and included in the package.
-#'
-#' \strong{Outputs}
-#' \itemize{
-#'   \item Packaged files in
-#'         \code{<project_root>/runs/<alpha_code>/Summaries/chatgpt/}
-#'         \code{suitability_package/}
-#'   \item Zip archive
-#'         \code{<project_root>/runs/<alpha_code>/Summaries/chatgpt/}
-#'         \code{suitability_package.zip}
-#'   \item Prompt template copied beside the archive
-#'   \item Updated species \code{\_log.txt}
-#' }
-#'
-#' Missing inputs are reported with \code{warning()}.  The zip archive is only
-#' created if at least one file is successfully copied.
 #'
 #' @param alpha_code Character. Four-letter species alpha code (e.g.,
 #'   \code{"CASP"}).
+#' @param files Character vector. File paths (without alpha_code prefix)
+#'   identifying which outputs to include in the AI package. All entries
+#'   must include a subdirectory relative to \code{Trends/}, for example:
+#'   \code{"suitability/Suitability-Trend.tif"} or
+#'   \code{"centroids/Bioclimatic-Velocity.csv"}.
+#'
+#'   Each file will be resolved as:
+#'   \code{<project_root>/runs/<alpha_code>/Trends/<subdir>/<alpha_code>-<filename>}
+#'
+#'   Defaults to a minimal core set.
 #'
 #' @return Named List (invisible).
 #' \itemize{
@@ -90,14 +62,26 @@
 #'
 #' @examples
 #' \dontrun{
-#' assemble_suitability_ai_package("CASP")
+#' assemble_ai_package("CASP")
 #' }
 #'
 #' @export
-assemble_suitability_ai_package <- function(alpha_code) {
+assemble_ai_package <- function(
+    alpha_code,
+    files = c(
+      "centroids/Bioclimatic-Velocity.csv",
+      "centroids/Centroids-Latitude-Summary.csv",
+      "centroids/Centroids-Longitude-Summary.csv",
+      "suitability/Suitability-Change-Trend.tif",
+      "suitability/Suitability-Trend-State-Analysis-Summary.csv",
+      "suitability/Suitability-Trend.tif",
+      "suitability/Species-Information.csv",
+      "variables/Variable-Contributions-BR-Stats.csv"
+    )
+) {
   # Start a timer for logging total elapsed time.
   start_time <- Sys.time()
-  message("[assemble_suitability_ai_package] Starting for alpha code: ", alpha_code)
+  message("[assemble_ai_package] Starting for alpha code: ", alpha_code)
 
   # ---------------------------------------------------------------------------
   # Define core path roots (relative to project root)
@@ -107,82 +91,83 @@ assemble_suitability_ai_package <- function(alpha_code) {
   resources_root <- file.path(proj_root, "resources")  # retained for backward compatibility
   data_root      <- file.path(proj_root, "data")
 
-  # Species-specific suitability-trends directory:
-  #   <project_root>/runs/<alpha_code>/Trends/suitability
+  # Species-specific suitability-trends directory
   trends_dir <- file.path(runs_root, alpha_code, "Trends", "suitability")
 
-  # Species-specific information table in Trends/suitability.
+  # Species-specific information table
   species_info_trends <- file.path(
     trends_dir,
     sprintf("%s-Species-Information.csv", alpha_code)
   )
 
-  # List of expected suitability-related files in Trends/suitability.
-  # The species-information file is added after we ensure it exists.
-  src_files <- c(
-    file.path(trends_dir, sprintf("%s-Suitability-Change-Trend.tif",               alpha_code)),
-    file.path(trends_dir, sprintf("%s-Suitability-Trend-GAP-Range-Percentages.csv", alpha_code)),
-    file.path(trends_dir, sprintf("%s-Suitability-Trend-Percentages.csv",          alpha_code)),
-    file.path(trends_dir, sprintf("%s-Suitability-Trend-State-Analysis-Hotspots-Stats.csv", alpha_code)),
-    file.path(trends_dir, sprintf("%s-Suitability-Trend-State-Analysis-Summary.csv",        alpha_code)),
-    file.path(trends_dir, sprintf("%s-Suitability-Trend-State-Analysis.csv",               alpha_code)),
-    file.path(trends_dir, sprintf("%s-Suitability-Trend.tif",                     alpha_code)),
-    species_info_trends
-  )
+  # ---------------------------------------------------------------------------
+  # Build source file list using required subpaths under Trends/
+  # ---------------------------------------------------------------------------
+  files <- as.character(files)
+
+  if (any(!grepl("/", files, fixed = TRUE))) {
+    stop("[assemble_ai_package] All entries in 'files' must include a subdirectory (e.g., 'suitability/file.tif').")
+  }
+
+  src_files <- vapply(files, function(f) {
+    file.path(
+      runs_root,
+      alpha_code,
+      "Trends",
+      dirname(f),
+      sprintf("%s-%s", alpha_code, basename(f))
+    )
+  }, character(1), USE.NAMES = FALSE)
+
+  # Ensure species info path is included
+  if (!species_info_trends %in% src_files) {
+    src_files <- c(src_files, species_info_trends)
+  }
+
+  message("[assemble_ai_package] Files requested:")
+  message(paste("  -", basename(src_files), collapse = "\n"))
 
   # ---------------------------------------------------------------------------
-  # Species-specific ChatGPT directories
+  # ChatGPT directories
   # ---------------------------------------------------------------------------
-  # Base ChatGPT summaries directory:
-  #   <project_root>/runs/<alpha_code>/Summaries/chatgpt
   alpha_chatgpt_dir <- file.path(runs_root, alpha_code, "Summaries", "chatgpt")
-  # Package subdirectory that will hold all AI-facing files:
-  #   <project_root>/runs/<alpha_code>/Summaries/chatgpt/suitability_package
   pkg_dir <- file.path(alpha_chatgpt_dir, "suitability_package")
 
-  # Create ChatGPT and package directories if they do not exist.
   if (!dir.exists(alpha_chatgpt_dir)) {
     dir.create(alpha_chatgpt_dir, recursive = TRUE, showWarnings = FALSE)
-    message("[assemble_suitability_ai_package] Created directory: ", alpha_chatgpt_dir)
+    message("[assemble_ai_package] Created directory: ", alpha_chatgpt_dir)
   }
   if (!dir.exists(pkg_dir)) {
     dir.create(pkg_dir, recursive = TRUE, showWarnings = FALSE)
-    message("[assemble_suitability_ai_package] Created directory: ", pkg_dir)
+    message("[assemble_ai_package] Created directory: ", pkg_dir)
   }
 
-  # Path for the zip archive that will be created from pkg_dir contents.
   zip_path <- file.path(alpha_chatgpt_dir, "suitability_package.zip")
 
   # ---------------------------------------------------------------------------
-  # Prompt template paths (now resolved from the installed rENM.ai package)
+  # Prompt template paths
   # ---------------------------------------------------------------------------
   prompt_src  <- system.file(
     "chatgpt",
     "suitability_prompt.txt",
-    package = "rENM.ai"
+    package = "rENM.dev"   # this need to point to correct package
   )
   prompt_dest <- file.path(alpha_chatgpt_dir, "suitability_prompt.txt")
 
   # ---------------------------------------------------------------------------
-  # Log file path (standard convention)
+  # Log file path
   # ---------------------------------------------------------------------------
-  # Species log file:
-  #   <project_root>/runs/<alpha_code>/_log.txt
   log_file <- file.path(runs_root, alpha_code, "_log.txt")
 
   # ---------------------------------------------------------------------------
-  # (0) Ensure species-information file exists in Trends/suitability
+  # Ensure species-information file exists
   # ---------------------------------------------------------------------------
-  message("[assemble_suitability_ai_package] Preparing species information file...")
+  message("[assemble_ai_package] Preparing species information file...")
 
-  # Shared species-info table:
-  #   <project_root>/data/_species.csv
   species_info_src <- file.path(data_root, "_species.csv")
 
-  # Copy the shared species-info table into the species' Trends/suitability
-  # directory with a species-specific name (overwrites if already present).
   if (!file.exists(species_info_src)) {
-    warning("[assemble_suitability_ai_package] Species info source not found: ", species_info_src)
+    warning("[assemble_ai_package] Species info source not found: ", species_info_src)
   } else {
     ok_species <- file.copy(
       from      = species_info_src,
@@ -194,22 +179,22 @@ assemble_suitability_ai_package <- function(alpha_code) {
       message("  - Species information copied to: ", species_info_trends)
     } else {
       warning(
-        "[assemble_suitability_ai_package] Failed to copy species info to: ",
+        "[assemble_ai_package] Failed to copy species info to: ",
         species_info_trends
       )
     }
   }
 
   # ---------------------------------------------------------------------------
-  # (1) Copy required files into species-specific suitability_package directory
+  # Copy files into package directory
   # ---------------------------------------------------------------------------
-  message("[assemble_suitability_ai_package] Copying suitability files into package directory...")
+  message("[assemble_ai_package] Copying selected files into package directory...")
 
-  copied_files <- character(0)  # Track successfully copied files for zipping.
+  copied_files <- character(0)
 
   for (src in src_files) {
     if (!file.exists(src)) {
-      warning("[assemble_suitability_ai_package] Missing source file: ", src)
+      warning("[assemble_ai_package] Missing source file: ", src)
       next
     }
 
@@ -220,67 +205,45 @@ assemble_suitability_ai_package <- function(alpha_code) {
       message("  - Copied: ", basename(src))
       copied_files <- c(copied_files, dest)
     } else {
-      warning("[assemble_suitability_ai_package] Failed to copy ", src, " to ", dest)
+      warning("[assemble_ai_package] Failed to copy ", src, " to ", dest)
     }
   }
 
   if (length(copied_files) == 0) {
-    warning("[assemble_suitability_ai_package] No files were copied; zip will not be created.")
+    warning("[assemble_ai_package] No files were copied; zip will not be created.")
   }
 
   # ---------------------------------------------------------------------------
-  # (2) Create a .zip file with the files in suitability_package
+  # Create zip archive
   # ---------------------------------------------------------------------------
   if (length(copied_files) > 0) {
-    message("[assemble_suitability_ai_package] Creating zip file: ", zip_path)
+    message("[assemble_ai_package] Creating zip file: ", zip_path)
 
     old_wd <- getwd()
     on.exit(setwd(old_wd), add = TRUE)
 
     setwd(pkg_dir)
-    utils::zip(
-      zipfile = zip_path,
-      files   = basename(copied_files)
-    )
-
-    if (file.exists(zip_path)) {
-      message("[assemble_suitability_ai_package] Zip created successfully.")
-    } else {
-      warning(
-        "[assemble_suitability_ai_package] Zip creation appears to have failed: ",
-        zip_path
-      )
-    }
+    utils::zip(zipfile = zip_path, files = basename(copied_files))
   }
 
   # ---------------------------------------------------------------------------
-  # (3) Copy the suitability_prompt.txt template to the alpha ChatGPT directory
+  # Copy prompt template
   # ---------------------------------------------------------------------------
-  message("[assemble_suitability_ai_package] Copying suitability_prompt.txt template...")
+  message("[assemble_ai_package] Copying suitability_prompt.txt template...")
 
   if (!nzchar(prompt_src) || !file.exists(prompt_src)) {
-    warning("[assemble_suitability_ai_package] Prompt source not found: ", prompt_src)
+    warning("[assemble_ai_package] Prompt source not found: ", prompt_src)
   } else {
-    ok_prompt <- file.copy(
-      from      = prompt_src,
-      to        = prompt_dest,
-      overwrite = TRUE
-    )
-
-    if (ok_prompt) {
-      message("  - Prompt copied to: ", prompt_dest)
-    } else {
-      warning("[assemble_suitability_ai_package] Failed to copy prompt to: ", prompt_dest)
-    }
+    file.copy(from = prompt_src, to = prompt_dest, overwrite = TRUE)
   }
 
   # ---------------------------------------------------------------------------
-  # (4) Append standard processing summary block to _log.txt
+  # Append processing summary to log
   # ---------------------------------------------------------------------------
   end_time    <- Sys.time()
   elapsed_sec <- as.numeric(difftime(end_time, start_time, units = "secs"))
 
-  message("[assemble_suitability_ai_package] Updating log file: ", log_file)
+  message("[assemble_ai_package] Updating log file: ", log_file)
 
   species_info_pkg <- file.path(pkg_dir, basename(species_info_trends))
 
@@ -295,7 +258,7 @@ assemble_suitability_ai_package <- function(alpha_code) {
 
   log_block <- c(
     paste0(strrep("-", 72)),
-    "Processing summary (assemble_suitability_ai_package)",
+    "Processing summary (assemble_ai_package)",
     sprintf("Timestamp: %s", format(end_time, "%Y-%m-%d %H:%M:%S")),
     sprintf("Alpha code: %s", alpha_code),
     "Raster source: Suitability trends and species information",
@@ -318,7 +281,7 @@ assemble_suitability_ai_package <- function(alpha_code) {
 
   cat(paste0(log_block, "\n"), file = log_file, append = TRUE)
 
-  message("[assemble_suitability_ai_package] Done for ", alpha_code, ".")
+  message("[assemble_ai_package] Done for ", alpha_code, ".")
 
   invisible(list(
     alpha_code          = alpha_code,
