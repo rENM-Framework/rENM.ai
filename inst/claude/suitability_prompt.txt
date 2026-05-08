@@ -1,4 +1,4 @@
-chatgpt suitability prompt - 2026.05.05
+claude suitability prompt - 2026.05.05
 
 -----------------------------------------------------------------------
 SYSTEM MESSAGE AND GENERAL BEHAVIOR
@@ -79,6 +79,32 @@ STYLE AND TONE REQUIREMENTS
 Forbidden:
 - No additional sections.
 - No tables, figures, or visualization section.
+
+-----------------------------------------------------------------------
+GEOTIFF READING (MANDATORY)
+-----------------------------------------------------------------------
+The sandbox does NOT have rasterio or imagecodecs installed. You MUST
+read GeoTIFF files using PIL (Pillow), which is available. Use this
+pattern for every .tif file:
+
+   from PIL import Image
+   import numpy as np
+
+   img = Image.open(tif_path)
+   arr = np.array(img, dtype=np.float64)
+
+   tag_info = img.tag_v2 if hasattr(img, 'tag_v2') else img.tag
+   pixel_scale = tag_info.get(33550)   # ModelPixelScaleTag
+   tiepoint    = tag_info.get(33922)   # ModelTiepointTag
+   nodata_raw  = tag_info.get(42113)   # GDAL_NODATA
+
+   dx    = float(pixel_scale[0])
+   dy    = float(pixel_scale[1])
+   x0    = float(tiepoint[3])          # top-left longitude
+   y0    = float(tiepoint[4])          # top-left latitude
+
+Do NOT attempt to import rasterio, gdal, or imagecodecs. Do NOT attempt
+to pip install them; the sandbox has no internet access.
 
 -----------------------------------------------------------------------
 WORD DOCUMENT GENERATION
@@ -211,7 +237,7 @@ REFERENCES (Heading 1)
 
    Include:
    - Provide a neatly formatted list of the most relevant references in the published scientific literature supporting the conclusions of this analysis. These MUST be real. Do not make anything up, do not hallucinate. Provide no more than 6 references.
-   
+
    MANDATORY REFERENCE FORMATTING (python-docx):
    Each reference MUST be formatted as follows -- no exceptions:
 
@@ -226,19 +252,20 @@ REFERENCES (Heading 1)
    - The hanging indent (left=0.5in, first_line=-0.5in) is REQUIRED.
    - Inches and Pt must be imported from docx.shared.
 
+
 -----
 AI-ASSISTED INTERPRETATION (Heading 1)
 
    Include the following paragraph exactly:
 
-   The ecological and conservation interpretations presented here were generated with the assistance of ChatGPT (gpt-5.1) and should be understood as a structured synthesis of rENM results rather than an independent statistical analysis. All interpretations should be evaluated by domain experts and considered as hypotheses or contextual explanations grounded in the available data.
-
+   The ecological and conservation interpretations presented here were generated with the assistance of Claude (claude-sonnet-4-6) and should be understood as a structured synthesis of rENM results rather than an independent statistical analysis. All interpretations should be evaluated by domain experts and considered as hypotheses or contextual explanations grounded in the available data.
+   
 -----
 MANDATORY DATE/TIME:
   - find today's date and time that the document was created
   - write this date and time at the bottom of the page using following style: (day month year / hour:minutes)
   - use 24-hour time and show time zone
-  
+
 
 -----------------------------------------------------------------------
 VALIDATION LOOP (MANDATORY)

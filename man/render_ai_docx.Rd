@@ -24,10 +24,6 @@ Converts a species-specific DOCX report into PDF and appends a processing
 summary to the run log.
 }
 \details{
-This function is part of the rENM framework's processing pipeline
-and operates within the project directory structure defined by
-rENM_project_dir().
-
 \strong{Inputs}
 \itemize{
 \item One DOCX file per species located at
@@ -52,7 +48,7 @@ rENM_project_dir().
 \examples{
 \dontrun{
 # Convert the Cassin's Sparrow report and view the resulting PDF path
-pdf_path <- render_ai_docs("CASP")
+pdf_path <- render_ai_docx("CASP")
 }
 
 }

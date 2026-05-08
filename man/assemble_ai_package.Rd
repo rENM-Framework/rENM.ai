@@ -2,7 +2,7 @@
 % Please edit documentation in R/ai-assemble_ai_package.R
 \name{assemble_ai_package}
 \alias{assemble_ai_package}
-\title{Assemble GenAI suitability package for a species}
+\title{Assemble a GenAI suitability package for a species}
 \usage{
 assemble_ai_package(
   alpha_code,
@@ -26,35 +26,52 @@ must include a subdirectory relative to \code{Trends/}, for example:
 \code{"centroids/Bioclimatic-Velocity.csv"}.
 
 Each file will be resolved as:
-\code{<project_root>/runs/<alpha_code>/Trends/<subdir>/<alpha_code>-<filename>}
+\preformatted{
+  <project_root>/runs/<alpha_code>/Trends/<subdir>/<alpha_code>-<filename>
+  }
 
 Defaults to a minimal core set.}
 }
 \value{
-Named List (invisible).
+Named list (invisible) with components:
 \itemize{
-\item \code{alpha_code}            – input species code
-\item \code{pkg_dir}               – path to \code{suitability_package}
-\item \code{alpha_chatgpt_dir}     – path to species \code{chatgpt} folder
-\item \code{zip_path}              – path to created archive
-\item \code{prompt_path}           – path to copied prompt file
-\item \code{species_info_trends}   – trends-level species table
-\item \code{species_info_pkg}      – table inside the package
-\item \code{log_file}              – updated log file
+\item \code{alpha_code}            -- input species code
+\item \code{pkg_dir}               -- path to staging \code{suitability_package/}
+\item \code{chatgpt_dir}           -- path to species \code{chatgpt/} folder
+\item \code{claude_dir}            -- path to species \code{claude/} folder
+\item \code{chatgpt_zip_path}      -- path to ChatGPT zip archive
+\item \code{claude_zip_path}       -- path to Claude zip archive
+\item \code{chatgpt_prompt_path}   -- path to copied ChatGPT prompt file
+\item \code{claude_prompt_path}    -- path to copied Claude prompt file
+\item \code{species_info_trends}   -- trends-level species table
+\item \code{species_info_pkg}      -- species table inside the staging package
+\item \code{log_file}              -- updated log file path
 }
 }
 \description{
 Collects selected suitability-trend rasters, summary tables, and species
 metadata for a single species, then builds an AI-ready package together
-with a prompt template and log entry.  The function locates the project root via
-\code{rENM_project_dir()} and no longer relies on hard-coded paths.
+with prompt templates and a log entry. The function locates the project
+root via \code{rENM_project_dir()} and does not rely on hard-coded paths.
 }
 \details{
-This function is part of the rENM framework's processing pipeline
-and operates within the project directory structure defined by
-rENM_project_dir().
+\strong{Pipeline context}
+\itemize{
+\item Copies selected suitability rasters and tables into a shared
+\code{suitability_package/} staging directory.
+\item Creates a \code{.zip} archive of the package contents.
+\item Copies the contents of \code{suitability_package/} and the
+corresponding prompt template into \emph{two} provider
+subdirectories under \code{Summaries/}:
+\code{chatgpt/} (prompt from \code{inst/chatgpt/}) and
+\code{claude/} (prompt from \code{inst/claude/}).
+\item Copies \code{\_species.csv} to a species-specific file and
+includes it in the package.
+\item Appends a standardized processing-summary block to
+\code{\_log.txt}.
+}
 
-\strong{Key update}
+\strong{File selection}
 \itemize{
 \item Adds flexible file selection via \code{files}.
 \item All files are drawn from subdirectories under \code{Trends/}.
@@ -63,18 +80,17 @@ rENM_project_dir().
 \code{"centroids/Bioclimatic-Velocity.csv"}).
 }
 
-\strong{Pipeline context}
-\itemize{
-\item Copies selected suitability rasters and tables into
-\code{suitability_package/}.
-\item Copies \code{\_species.csv} to a species-specific file and
-includes it in the package.
-\item Creates a \code{.zip} archive of the package contents.
-\item Copies the ChatGPT prompt template resolved via
-\code{system.file("chatgpt", "suitability_prompt.txt",
-        package = "rENM.ai")} into the species \code{chatgpt/} directory.
-\item Appends a standardized processing-summary block to
-\code{\_log.txt}.
+\strong{Directory layout produced}
+\preformatted{
+runs/<alpha_code>/Summaries/
+  chatgpt/
+    suitability_package/   <- staged files
+    suitability_package.zip
+    suitability_prompt.txt <- from inst/chatgpt/
+  claude/
+    suitability_package/   <- same staged files
+    suitability_package.zip
+    suitability_prompt.txt <- from inst/claude/
 }
 }
 \examples{

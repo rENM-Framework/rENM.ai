@@ -1,15 +1,11 @@
-#' Submit GenAI-ready climatic suitability trend package for a species
+#' Submit a GenAI-ready climatic suitability trend package to ChatGPT
 #'
-#' Runs an end-to-end climatic suitability trend analysis for a single
+#' Interprets analysis outputs from an rENM run for a single
 #' species by sending a zipped data bundle and custom prompt to the OpenAI
 #' Responses API, retrieving a DOCX report, and logging processing
 #' metadata and cost information.
 #'
 #' @details
-#' This function is part of the rENM framework's processing pipeline
-#' and operates within the project directory structure defined by
-#' \code{rENM_project_dir()}.
-#'
 #' \strong{Pipeline context}
 #' \itemize{
 #'   \item Reads a species-specific prompt file.
@@ -66,7 +62,7 @@
 #' @importFrom httr2 resp_body_string resp_body_json resp_body_raw req_error
 #'
 #' @export
-submit_ai_package <- function(
+submit_to_chatgpt <- function(
     alpha_code,
     model   = "gpt-5.1",
     api_key = Sys.getenv("OPENAI_API_KEY")
@@ -79,7 +75,6 @@ submit_ai_package <- function(
     }
   }
 
-  `%||%` <- function(x, y) if (is.null(x)) y else x
 
   api_key <- trimws(api_key)
   if (!nzchar(api_key)) stop("OPENAI_API_KEY is not set.", call. = FALSE)
@@ -184,7 +179,7 @@ submit_ai_package <- function(
   }
 
   # ---- Log ------------------------------------------------------------------
-  .submit_ai_package_log(
+  .submit_to_chatgpt_log(
     alpha_code      = alpha_code,
     species_dir     = species_dir,
     raster_source   = basename(zip_path),
@@ -209,7 +204,8 @@ submit_ai_package <- function(
 }
 
 # Internal helper: append eBird-style processing summary to _log.txt
-.submit_ai_package_log <- function(alpha_code,
+#' @noRd
+.submit_to_chatgpt_log <- function(alpha_code,
                                    species_dir,
                                    raster_source,
                                    docx_path_final,
@@ -229,7 +225,7 @@ submit_ai_package <- function(
 
   log_lines <- c(
     sep_line,
-    "Processing summary (submit_ai_package)",
+    "Processing summary (submit_to_chatgpt)",
     fmt("Timestamp",       format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z")),
     fmt("Alpha code",      alpha_code),
     fmt("Raster source",   raster_source),

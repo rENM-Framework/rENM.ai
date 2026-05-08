@@ -4,10 +4,6 @@
 #' summary to the run log.
 #'
 #' @details
-#' This function is part of the rENM framework's processing pipeline
-#' and operates within the project directory structure defined by
-#' rENM_project_dir().
-#'
 #' \strong{Inputs}
 #' \itemize{
 #'   \item One DOCX file per species located at
@@ -42,7 +38,7 @@
 #' @examples
 #' \dontrun{
 #' # Convert the Cassin's Sparrow report and view the resulting PDF path
-#' pdf_path <- render_ai_docs("CASP")
+#' pdf_path <- render_ai_docx("CASP")
 #' }
 #'
 #' @export
@@ -91,7 +87,7 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
   # 4. Convert DOCX → PDF
   # -------------------------------------------------------------
   if (verbose) {
-    message("[render_ai_docs] Converting DOCX to PDF:")
+    message("[render_ai_docx] Converting DOCX to PDF:")
     message("  Input:  ", docx_path)
     message("  Output: ", pdf_path)
   }
@@ -107,13 +103,13 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
 
   if (status != 0 || !file.exists(pdf_path)) {
     stop(
-      "[render_ai_docs] LibreOffice failed to convert DOCX to PDF.\n",
+      "[render_ai_docx] LibreOffice failed to convert DOCX to PDF.\n",
       "  Command was:\n  ", cmd
     )
   }
 
   if (verbose) {
-    message("[render_ai_docs] Conversion complete: ", pdf_path)
+    message("[render_ai_docx] Conversion complete: ", pdf_path)
   }
 
   # -------------------------------------------------------------
@@ -132,7 +128,7 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
   log_text <- c(
     "",
     "------------------------------------------------------------------------",
-    " Processing summary (render_ai_docs)",
+    " Processing summary (render_ai_docx)",
     sprintf(" Timestamp:        %s", timestamp),
     sprintf(" Alpha code:       %s", code),
     sprintf(" DOCX input:       %s", docx_path),
@@ -148,7 +144,7 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
   write(log_text, file = log_path, append = TRUE)
 
   if (verbose) {
-    message("[render_ai_docs] Log entry appended to: ", log_path)
+    message("[render_ai_docx] Log entry appended to: ", log_path)
   }
 
   invisible(pdf_path)
