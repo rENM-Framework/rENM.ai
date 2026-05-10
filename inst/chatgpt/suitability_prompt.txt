@@ -210,7 +210,7 @@ ENVIRONMENTAL STRUCTURE (Heading 1)
 REFERENCES (Heading 1)
 
    Include:
-   - Provide a neatly formatted list of the most relevant references in the published scientific literature supporting the conclusions of this analysis. These MUST be real. Do not make anything up, do not hallucinate. Provide no more than 6 references.
+   - Provide a neatly formatted list of the MOST RELEVANT REFERENCES in the published scientific literature supporting the conclusions of this analysis. These MUST be real. Do not make anything up, do not hallucinate. Provide no more than 7 references.
    
    MANDATORY REFERENCE FORMATTING (python-docx):
    Each reference MUST be formatted as follows -- no exceptions:
