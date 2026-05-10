@@ -283,19 +283,34 @@ assemble_ai_package <- function(
   )
   outputs_saved <- outputs_saved[!is.na(outputs_saved)]
 
+  # origiinal code ---
+  # log_block <- c(
+  #   paste0(strrep("-", 72)),
+  #   "Processing summary (assemble_ai_package)",
+  #   sprintf("Timestamp:     %s", format(end_time, "%Y-%m-%d %H:%M:%S")),
+  #   sprintf("Alpha code:    %s", alpha_code),
+  #   "Raster source: Suitability trends and species information",
+  #   sprintf(
+  #     "Outputs saved: %s",
+  #     if (length(outputs_saved) > 0)
+  #       paste(outputs_saved, collapse = "; ")
+  #     else
+  #       "None"
+  #   ),
+  #   sprintf("Total elapsed: %.3f secs", elapsed_sec),
+  #   ""
+  # )
+
   log_block <- c(
     paste0(strrep("-", 72)),
     "Processing summary (assemble_ai_package)",
     sprintf("Timestamp:     %s", format(end_time, "%Y-%m-%d %H:%M:%S")),
     sprintf("Alpha code:    %s", alpha_code),
     "Raster source: Suitability trends and species information",
-    sprintf(
-      "Outputs saved: %s",
-      if (length(outputs_saved) > 0)
-        paste(outputs_saved, collapse = "; ")
-      else
-        "None"
-    ),
+    if (length(outputs_saved) > 0)
+      c("Outputs saved:", paste0("  ", outputs_saved))
+    else
+      "Outputs saved: None",
     sprintf("Total elapsed: %.3f secs", elapsed_sec),
     ""
   )
