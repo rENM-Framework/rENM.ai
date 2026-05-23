@@ -77,9 +77,27 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
   # -------------------------------------------------------------
   soffice <- Sys.which("soffice")
   if (!nzchar(soffice)) {
+    # Sys.which() only searches PATH. On macOS, LibreOffice installs to
+    # /Applications and soffice is not on PATH unless the user added it.
+    # Check common fixed locations before giving up.
+    candidates <- c(
+      "/Applications/LibreOffice.app/Contents/MacOS/soffice",  # macOS standard
+      "/usr/bin/soffice",                                        # Linux distro package
+      "/usr/local/bin/soffice",                                  # Linux local install
+      "/opt/libreoffice/program/soffice",                        # Linux flatpak / custom
+      "/snap/bin/libreoffice"                                    # Linux snap
+    )
+    hit <- Filter(file.exists, candidates)
+    if (length(hit)) soffice <- hit[[1L]]
+  }
+  if (!nzchar(soffice)) {
     stop(
-      "LibreOffice 'soffice' not found on PATH.\n",
-      "Install LibreOffice or ensure 'soffice' is available."
+      "LibreOffice 'soffice' not found on PATH or in common install locations.\n",
+      "Install LibreOffice from https://www.libreoffice.org, then either:\n",
+      "  (a) add it to your PATH, or\n",
+      "  (b) on macOS run once in Terminal:\n",
+      "      sudo ln -s /Applications/LibreOffice.app/Contents/MacOS/soffice",
+      " /usr/local/bin/soffice"
     )
   }
 
