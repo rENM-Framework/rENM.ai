@@ -1,9 +1,6 @@
----
+------------------------------------------------------------------------
 
-editor_options: 
-  markdown: 
-    wrap: 72
----
+editor_options: markdown: wrap: 72 ---
 
 # rENM.ai
 
@@ -20,7 +17,7 @@ This package depends on `rENM.core` for project-directory resolution and species
 ## Key functions
 
 | Function | Description |
-|------------------------------------|------------------------------------|
+|----|----|
 | `assemble_ai_package()` | Build and stage AI-ready data bundles for ChatGPT and Claude |
 | `submit_to_chatgpt()` | Upload data bundle to OpenAI and retrieve a DOCX report |
 | `submit_to_claude()` | Upload data bundle to Anthropic and retrieve a DOCX report |
@@ -31,27 +28,21 @@ This package depends on `rENM.core` for project-directory resolution and species
 
 ### LibreOffice
 
-`render_ai_docx()` converts AI-generated DOCX reports to PDF using LibreOffice
-in headless mode. LibreOffice must be installed before calling that function.
+`render_ai_docx()` converts AI-generated DOCX reports to PDF using LibreOffice in headless mode. LibreOffice must be installed before calling that function.
 
-Download from <https://www.libreoffice.org>. On macOS, `soffice` is **not**
-added to `PATH` automatically after installation — run this once in Terminal:
+Download from <https://www.libreoffice.org>. On macOS, `soffice` is **not** added to `PATH` automatically after installation — run this once in Terminal:
 
 ``` bash
 sudo ln -s /Applications/LibreOffice.app/Contents/MacOS/soffice /usr/local/bin/soffice
 ```
 
-On Linux, install via your package manager (`apt install libreoffice` or
-equivalent); `soffice` is placed on `PATH` automatically.
+On Linux, install via your package manager (`apt install libreoffice` or equivalent); `soffice` is placed on `PATH` automatically.
 
-If LibreOffice is absent, `render_ai_docx()` stops with a clear error message
-listing the install URL and the `sudo ln -s` command above.
+If LibreOffice is absent, `render_ai_docx()` stops with a clear error message listing the install URL and the `sudo ln -s` command above.
 
 ### API keys
 
-`submit_to_claude()` and `submit_to_chatgpt()` each require a valid API key
-for the respective provider (see **Authentication** below). Keys are billed
-per token, independently of any web subscription.
+`submit_to_claude()` and `submit_to_chatgpt()` each require a valid API key for the respective provider (see **Authentication** below). Keys are billed per token, independently of any web subscription.
 
 ## Installation
 
