@@ -1,7 +1,3 @@
-------------------------------------------------------------------------
-
-editor_options: markdown: wrap: 72 ---
-
 # rENM.ai
 
 ![rENM](https://img.shields.io/badge/rENM-framework-blue) ![module](https://img.shields.io/badge/module-ai-informational)
@@ -17,7 +13,7 @@ This package depends on `rENM.core` for project-directory resolution and species
 ## Key functions
 
 | Function | Description |
-|----|----|
+|------------------------------------|------------------------------------|
 | `assemble_ai_package()` | Build and stage AI-ready data bundles for ChatGPT and Claude |
 | `submit_to_chatgpt()` | Upload data bundle to OpenAI and retrieve a DOCX report |
 | `submit_to_claude()` | Upload data bundle to Anthropic and retrieve a DOCX report |
