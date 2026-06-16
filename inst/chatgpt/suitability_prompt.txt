@@ -100,9 +100,10 @@ REPORT STRUCTURE
 
 DOCUMENT TITLE
 - Retrieve <common_name> and <scientific_name> from the <alpha_code>-Species-Information.csv file by using the alpha_code column entry matching <alpha_code> to find the corresponding <common_name> and <scientific_name>
-- Create two separate paragraphs, each using Word’s “Title” style:
+- Create three separate paragraphs, each using Word's "Title" style:
     Line 1: Climatic Suitability Trend Analysis
     Line 2: for <common_name> (<alpha_code>)
+    Line 3: 1980-2024 (use an en-dash, not a hyphen)
 - Title MUST be left justified.
 
 -----------------------------------------------------------------------
@@ -236,9 +237,9 @@ AI-ASSISTED INTERPRETATION (Heading 1)
 -----
 MANDATORY DATE/TIME:
   - find today's date and time that the document was created
-  - write this date and time at the bottom of the page using following style: (day month year / hour:minutes)
   - use 24-hour time and show time zone
-  
+  - write this date and time at the bottom of the page using following style:
+    (rENM Framework Version 0.1.0 - day month year - hour:minutes time zone)
 
 -----------------------------------------------------------------------
 VALIDATION LOOP (MANDATORY)
