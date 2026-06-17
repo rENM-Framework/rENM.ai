@@ -228,11 +228,34 @@ REFERENCES (Heading 1)
    - Inches and Pt must be imported from docx.shared.
 
 -----
+Insert a page break here to place this section on the last page
+
 AI-ASSISTED INTERPRETATION (Heading 1)
 
    Include the following paragraph exactly:
 
    The ecological and conservation interpretations presented here were generated with the assistance of ChatGPT (gpt-5.1) and should be understood as a structured synthesis of rENM results rather than an independent statistical analysis. All interpretations should be evaluated by domain experts and considered as hypotheses or contextual explanations grounded in the available data.
+
+-----
+INCLUDED FIGURES (Heading 1)
+
+   Include the following paragraph exactly:
+   	
+   Page 5 - Climatic Suitability Time Series
+   Page 6 - Range Time Series
+   Page 7 - Climatic Suitability Trends
+   Page 8 - State-Level Suitability Trend and HotSpot Summary
+   Page 9 - Climatic Suitability Trend with Centroid Shift
+   Page 10 - Variable Contribution Trends
+   Page 11 - Predictor Variable Trends
+   Page 14 - rENM Framework MERRA Variables
+   	
+-----
+For additional information about the rENM Framework, see: (Heading 1)
+
+Include the following paragraph exactly:
+
+   Schnase, J. L., M. L. Carroll, P. M. Montesano, and V. A. Seamster. (in preparation). The rENM Framework: Toward a modular system for reconstructing and analyzing long-term ecological niche dynamics.
 
 -----
 MANDATORY DATE/TIME:
