@@ -1,4 +1,4 @@
-claude suitability prompt - 2026.05.05
+claude suitability prompt - 2026.06.17
 
 -----------------------------------------------------------------------
 SYSTEM MESSAGE AND GENERAL BEHAVIOR
@@ -261,7 +261,7 @@ AI-ASSISTED INTERPRETATION (Heading 1)
 
    Include the following paragraph exactly:
 
-   The ecological and conservation interpretations presented here were generated with the assistance of ChatGPT (gpt-5.1) and should be understood as a structured synthesis of rENM results rather than an independent statistical analysis. All interpretations should be evaluated by domain experts and considered as hypotheses or contextual explanations grounded in the available data.
+   The ecological and conservation interpretations presented here were generated with the assistance of Claude (Sonnet 4.6) and should be understood as a structured synthesis of rENM results rather than an independent statistical analysis. All interpretations should be evaluated by domain experts and considered as hypotheses or contextual explanations grounded in the available data.
 
 -----
 INCLUDED FIGURES (Heading 1)
