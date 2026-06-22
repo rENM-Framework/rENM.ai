@@ -1,6 +1,6 @@
 # rENM.ai
 
-![rENM](https://img.shields.io/badge/rENM-framework-blue) ![module](https://img.shields.io/badge/module-ai-informational)
+![rENM](https://img.shields.io/badge/rENM-framework-blue) ![module](https://img.shields.io/badge/module-ai-informational)[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.20798613.svg)](https://doi.org/10.5281/zenodo.20798613)
 
 **AI-assisted synthesis and reporting for the rENM Framework**
 
