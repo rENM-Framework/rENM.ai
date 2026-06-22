@@ -44,10 +44,10 @@ If LibreOffice is absent, `render_ai_docx()` stops with a clear error message li
 
 ``` r
 # From GitHub
-devtools::install_github("rENM-Framework/rENM.ai")
+remotes::install_github("rENM-Framework/rENM.ai")
 
 # From a local source directory
-devtools::install_local("rENM.ai")
+remotes::install_local("rENM.ai")
 ```
 
 ## Getting started
