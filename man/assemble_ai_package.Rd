@@ -10,6 +10,7 @@ assemble_ai_package(
     "centroids/Centroids-Latitude-Summary.csv",
     "centroids/Centroids-Longitude-Summary.csv",
     "suitability/Suitability-Change-Trend.tif",
+    "suitability/Suitability-Trend-Boundary-Statistics.csv",
     "suitability/Suitability-Trend-State-Analysis-Summary.csv",
     "suitability/Suitability-Trend.tif", "suitability/Species-Information.csv",
     "variables/Variable-Contributions-BR-Stats.csv")
