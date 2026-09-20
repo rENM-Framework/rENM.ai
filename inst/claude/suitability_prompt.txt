@@ -382,7 +382,7 @@ For additional information about the rENM Framework, see: (Heading 1)
 
 Include the following paragraph exactly:
 
-   Schnase, J. L., M. L. Carroll, P. M. Montesano, and V. A. Seamster. 2026. The rENM Framework: Toward a Modular System for Reconstructing and Analyzing Long-Term Ecological Niche Dynamics. bioRxiv preprint, in preparation.
+   Schnase, John L., Mark L. Carroll, Paul M. Montesano, and Virginia A. Seamster. "The rENM Framework: A Modular System for Reconstructing and Analyzing Long-Term Ecological Niche Dynamics." Preprint, bioRxiv, August 7, 2026. https://doi.org/10.64898/2026.08.06.741224.
 
 -----
 MANDATORY DATE/TIME:
