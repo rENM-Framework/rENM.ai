@@ -1,4 +1,4 @@
-chatgpt suitability prompt - 2026.06.17
+chatgpt suitability prompt - 2026.09.20
 
 -----------------------------------------------------------------------
 SYSTEM MESSAGE AND GENERAL BEHAVIOR
@@ -43,7 +43,16 @@ SPATIAL DESCRIPTION RULES
 -----------------------------------------------------------------------
 AREA COMPUTATION RULES
 -----------------------------------------------------------------------
-- Reproject rasters to an equal-area CRS (EPSG:6933).
+PRIORITY: When an area or percentage is already given in one of the CSV
+files, USE THAT VALUE. Do NOT recompute it from a raster. The pipeline
+computes these with cell-coverage weighting in an equal-area projection;
+a recomputed value will disagree with the tables in the same report.
+
+Compute from rasters ONLY for quantities no CSV provides.
+
+When you must compute:
+- Reproject rasters to an equal-area CRS (EPSG:5070, USA Contiguous Albers
+  Equal Area Conic), matching the projection the pipeline uses.
 - Compute per-cell area:
    cell_area_km2 = |a11 * a22| / 1,000,000
 - Modeled extent (km²) = non-NA cell count × cell_area_km2.
@@ -58,6 +67,25 @@ Trend classification thresholds:
 These three thresholds also define “positive,” “stable,” and “negative” trend areas respectively.
 
 MANDATORY: DO NOT include trend classification thresholds in your descriptions.
+
+-----------------------------------------------------------------------
+DATA RELIABILITY (MANDATORY)
+-----------------------------------------------------------------------
+A statistic computed over many raster cells is stable; one computed over
+few is not. This governs how much weight each figure can carry.
+
+- Range-wide figures — modeled extent, range interior, buffer ring, and
+  the centroid metrics — are well estimated. Interpretation may rest on
+  them.
+- Figures for states holding a large share of the range are reasonably
+  stable.
+- Figures for states holding a small share of the range are volatile
+  between model runs and can even change sign. Report them when asked,
+  but do NOT build an argument on a single small state and do NOT present
+  one as evidence on its own.
+
+Do NOT treat a small difference between two figures as meaningful. Do NOT
+imply more precision than a figure carries.
 
 -----------------------------------------------------------------------
 PARAGRAPH CONTROL (HARD LIMIT)
@@ -109,13 +137,21 @@ DOCUMENT TITLE
 -----------------------------------------------------------------------
 CLIMATIC SUITABILITY (Heading 1)
 -----------------------------------------------------------------------
-   This section contains EXACTLY 5 paragraphs:
+   This section contains EXACTLY 6 paragraphs:
 
    **Paragraph 1: Based on the Suitability-Trend.tif file**
    
    Range-wide Suitability Trends (Heading 3)
 
    This raster represents the long-term (1980–2020) Theil-Sen trend in suitability probability over 5-year intervals.
+
+   The modeled extent is the rectangular bounding box of the species' USGS
+   GAP range polygon after that polygon has been buffered outward by a fixed
+   250 km margin. The buffer gives a shifting range edge room to appear in
+   the trend surface instead of being clipped at a decades-old range
+   boundary. Describe the extent this way when you refer to it. Do NOT
+   describe it as the GAP range itself, and do NOT describe it as derived
+   from occurrence records.
 
    Include:
    - Modeled extent (km²).
@@ -164,7 +200,9 @@ CLIMATIC SUITABILITY (Heading 1)
    
    State-level Suitability Trends / Hot Spots (Heading 3)
    
-   This file shows the *states encompassing* the USGS GAP range for the focal species along with state's area in km^2, the coverage area of the GAP range within each state, the percent of the total GAP range in each state, and the suitability trend percentage in each state that is either positive or negative. The file also shows the area size and percentage of "hot spots" in each state, which we define as areas where declining trends in suitability are accelerating.
+   This file covers the states intersecting the USGS GAP range for the focal species. For each state it gives: the portion of that state lying inside the modeled extent (column "extent_area_state" -- this is NOT the state's total area, and must never be described as such), the GAP range area within the state, that state's share of the species' total GAP range, the percentages of range area with positive and negative suitability trends, and the area and percentage of "hot spots," which we define as areas where declining trends in suitability are accelerating.
+
+   Hot spot percentage is hot spot area divided by that state's range area.
 
    Include:
    - GAP area and percent of GAP range in each of the TOP 3 states based on the percent of total GAP range in each state. Do not mention any other states.
@@ -174,11 +212,58 @@ CLIMATIC SUITABILITY (Heading 1)
    - STRICTLY descriptive. No ecological interpretation
 
    
-   **Paragraph 5:**
-   Ecological / Conservation Interpretation (Heading 3)
+   **Paragraph 5: Based on the Suitability-Trend-Boundary-Statistics.csv file**
+
+   Range Boundary Dynamics (Heading 3)
+
+   This file compares trend behavior inside the GAP range against the buffer
+   ring surrounding it: the zone lying between the range polygon and that
+   same polygon buffered outward by 250 km. The two zones are disjoint. It
+   contains two rows, "interior" and "ring", each giving area, the
+   percentages of area with positive and negative trends, and hot spot area
+   and percentage.
+
+   A static range polygon cannot reveal a range edge that is moving, because
+   it never looks beyond the boundary. This comparison does.
 
    Include:
-   - Short ecological and conservation interpretation of these findings (<= 150 words). Base your analysis on real data and published facts. Do not make anything up, do not hallucinate.
+   - The positive percentage for each zone, and the difference between them.
+   - The hot spot percentage for each zone.
+   - A plain statement of which way the comparison runs: whether the ring is
+     more or less positive than the interior.
+   - STRICTLY descriptive. No ecological interpretation.
+
+   MANDATORY: Do NOT sum, average, or otherwise combine the two zones. They
+   are separate regions answering different questions.
+
+
+   **Paragraph 6:**
+   Ecological / Conservation Interpretation (Heading 3)
+
+   Synthesize the five preceding descriptions into an interpretation
+   specific to THIS species and THIS pattern. An interpretation that would
+   read the same for any declining species has failed.
+
+   Interpretation comes from connecting the findings to one another:
+   - Does the direction of centroid movement agree with where the positive
+     and negative trends actually lie? Say so if it does, and say so if it
+     does not.
+   - Does the boundary comparison support or contradict a shifting range? A
+     ring more positive than the interior is consistent with an advancing
+     leading edge. A ring less positive indicates the surrounding zone is
+     deteriorating faster than the occupied range, which constrains movement
+     rather than enabling it. Do NOT assume either direction; read what the
+     data shows.
+   - Where hot spots concentrate, say what that implies about where decline
+     is not merely present but gathering pace.
+
+   Constraints:
+   - Base claims on the data in this package and on published literature you
+     are confident is real. Do not fabricate references, values, or
+     mechanisms.
+   - State uncertainty where the evidence is mixed. A hedge that reflects
+     the data is better than false confidence.
+   - <= 150 words.
 
 
 -----
@@ -200,11 +285,24 @@ ENVIRONMENTAL STRUCTURE (Heading 1)
 
    
    **Paragraph 2:**
-   
+
    Ecological / Conservation Interpretation (Heading 3)
 
-   Include:
-   - Short ecological and conservation interpretation of these findings (<= 150 words). Base your analysis on real data and published facts. Do not make anything up, do not hallucinate.
+   Interpret what the variable profile implies about the mechanisms behind
+   the suitability trends described in the previous section. Connect the
+   two: if moisture-related variables dominate and trends are negative, say
+   what that suggests; if the leading variables are thermal, say that
+   instead.
+
+   Constraints:
+   - Name a mechanism only where the variable contributions support it.
+   - Distinguish what the data shows from what it suggests.
+   - Do NOT restate the interpretation from the CLIMATIC SUITABILITY
+     section. Extend it.
+   - Base claims on the data in this package and on published literature you
+     are confident is real. Do not fabricate references, values, or
+     mechanisms.
+   - <= 150 words.
 
 
 -----
@@ -239,17 +337,20 @@ AI-ASSISTED INTERPRETATION (Heading 1)
 -----
 INCLUDED FIGURES (Heading 1)
 
-   Include the following paragraph exactly:
-   	
-   Page 5 - Climatic Suitability Time Series
-   Page 6 - Range Time Series
-   Page 7 - Climatic Suitability Trends
-   Page 8 - State-Level Suitability Trend and HotSpot Summary
-   Page 9 - Climatic Suitability Trend with Centroid Shift
-   Page 10 - Variable Contribution Trends
-   Page 11 - Predictor Variable Trends
-   Page 14 - rENM Framework MERRA Variables
-   	
+   Include the following list exactly, with no page numbers. Page numbers
+   are deliberately omitted: this narrative is itself one section of the
+   assembled report, so its own length determines where the later pages
+   fall, and any number written here would be a guess.
+
+   Climatic Suitability Time Series
+   Range Time Series
+   Climatic Suitability Trends
+   State-Level Suitability Trend and HotSpot Summary
+   Climatic Suitability Trend with Centroid Shift
+   Variable Contribution Trends
+   Predictor Variable Trends
+   rENM Framework MERRA Variables
+
 -----
 For additional information about the rENM Framework, see: (Heading 1)
 
@@ -262,7 +363,7 @@ MANDATORY DATE/TIME:
   - find today's date and time that the document was created
   - use 24-hour time and show time zone
   - write this date and time at the bottom of the page using following style:
-    (rENM Framework Version 0.1.0 - day month year - hour:minutes time zone)
+    (rENM Framework Version 0.2.0 - day month year - hour:minutes time zone)
 
 -----------------------------------------------------------------------
 VALIDATION LOOP (MANDATORY)
@@ -270,12 +371,17 @@ VALIDATION LOOP (MANDATORY)
 Before saving:
 
 CHECK:
-1. CLIMATIC SUITABILITY = 5 paragraphs
+1. CLIMATIC SUITABILITY = 6 paragraphs
 2. ENVIRONMENTAL STRUCTURE = 2 paragraphs
 3. Word limits satisfied
 4. Only top 3 states included
 5. Hot spots definition is included
 6. No extra sections
+7. Extent described as the buffered GAP range, not as the GAP range itself
+   and not as occurrence-derived
+8. Interior and ring reported separately, never summed or averaged
+9. No argument resting on a single small-range state
+10. Areas taken from the CSVs wherever the CSVs provide them
 
 IF ANY FAIL:
 - Fix
