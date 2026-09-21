@@ -1,4 +1,12 @@
 # rENM.ai 0.2.0.9000
+* Narrative prompts — paragraph 1 must now state `valid_area_km2` as its own
+  figure whenever it differs from `extent_area_km2`. Greater Roadrunner was
+  the first species whose extent carries no-data cells, its range reaching
+  the Pacific while MERRAclim is land-only, and its report gave an extent of
+  7,585,669.87 km² and then percentages over a denominator of 5,761,688.63
+  km² that appeared nowhere in the document. The conditional wording about
+  which denominator to name was already correct; this adds the number beside
+  it so the arithmetic can be checked.
 * Narrative prompts — the closing timestamp line is now specified as the
   final body paragraph, with page headers and footers ruled out explicitly.
   The instruction read "write the following line at the bottom of the page",

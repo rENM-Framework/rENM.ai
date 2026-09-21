@@ -208,15 +208,21 @@ CLIMATIC SUITABILITY (Heading 1)
    When you state a percentage, say what it is a percentage OF.
    percent_positive is positive_area_km2 divided by valid_area_km2. Compare
    valid_area_km2 with extent_area_km2 and describe it accordingly:
-   - Equal: the raster covers the whole extent with no missing cells, and
-     the percentages may be described as shares of the modeled extent.
-   - Different: describe them as shares of the area carrying data, and do
-     NOT call them shares of the modeled extent.
+   - Equal: the raster covers the whole extent with no missing cells. The
+     percentages may be described as shares of the modeled extent, and
+     valid_area_km2 need not be stated separately.
+   - Different: part of the extent carries no data. You MUST state
+     valid_area_km2 as its own figure, and describe the percentages as
+     shares of that area, NOT of the modeled extent. A reader given only the
+     extent and a percentage cannot check the arithmetic, because the
+     denominator is a number you did not print.
 
    Use the raster ONLY for where things are, never for how much.
 
    Include:
    - Modeled extent (km²), from extent_area_km2.
+   - Area carrying data (km²), from valid_area_km2, whenever it differs from
+     extent_area_km2.
    - Areas and percentages of positive and negative trends, from the CSV.
    - Geographic distribution of the areas showing positive and negative trends.
    - Important positive and negative trend gradients if they exist.
