@@ -424,11 +424,16 @@ Include the following paragraph exactly:
    Schnase, John L., Mark L. Carroll, Paul M. Montesano, and Virginia A. Seamster. "The rENM Framework: A Modular System for Reconstructing and Analyzing Long-Term Ecological Niche Dynamics." Preprint, bioRxiv, August 7, 2026. https://doi.org/10.64898/2026.08.06.741224.
 
 -----
-MANDATORY FOOTER:
-  - write the following line at the bottom of the page, exactly as given:
+MANDATORY CLOSING LINE:
+  - The FINAL paragraph of the document is this line, exactly as given:
     (rENM Framework - <timestamp>)
-  - Reproduce it verbatim. Do NOT compute, look up, or reformat the date and
-    time. They are supplied to you already formatted.
+  - Add it with doc.add_paragraph() as ordinary body text, directly after the
+    citation above.
+  - Do NOT place it in a Word header or footer (section.header /
+    section.footer). Those repeat on every page. This line appears ONCE, at
+    the very end of the document.
+  - Reproduce the date and time verbatim. Do NOT compute, look up, or
+    reformat them. They are supplied to you already formatted.
 
 -----------------------------------------------------------------------
 VALIDATION LOOP (MANDATORY)
@@ -455,6 +460,8 @@ CHECK:
 13. Every paragraph ends with a complete sentence and terminal punctuation.
     Check the last character of each paragraph. A paragraph cut off at the
     word limit fails this check even though its count is correct.
+14. The closing (rENM Framework - ...) line appears exactly once, as the last
+    body paragraph, and is NOT in a page header or footer.
 
 IF ANY FAIL:
 - Fix

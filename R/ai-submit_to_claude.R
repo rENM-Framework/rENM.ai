@@ -85,17 +85,20 @@
 #'
 #' \strong{Cost estimation}
 #'
-#' Approximate costs using claude-sonnet-4-6 pricing as of May 2026:
+#' Approximate costs using claude-opus-5 pricing as of September 2026:
 #' \itemize{
-#'   \item Input tokens:  $3.00 / 1M tokens
-#'   \item Output tokens: $15.00 / 1M tokens
+#'   \item Input tokens:  $5.00 / 1M tokens
+#'   \item Output tokens: $25.00 / 1M tokens
 #' }
-#' These are estimates only; actual billing may differ.
+#' These are estimates only; actual billing may differ, and they are wrong
+#' for any other value of \code{model}.
 #'
 #' @param alpha_code Character. Four-letter species alpha code (e.g.,
 #'   \code{"CASP"}).
 #' @param model Character. Anthropic model identifier. Defaults to
-#'   \code{"claude-sonnet-4-6"}.
+#'   \code{"claude-opus-5"}. Note that \code{"claude-sonnet-4-6"} is both
+#'   previous-generation and dearer than \code{"claude-sonnet-5"}; prefer the
+#'   latter if a cheaper model is wanted.
 #' @param api_key Character. Anthropic API key. Defaults to the value of
 #'   the \code{ANTHROPIC_API_KEY} environment variable.
 #' @param max_tokens Integer. Maximum output tokens. Defaults to 32000.
@@ -146,7 +149,7 @@
 #' @export
 submit_to_claude <- function(
     alpha_code,
-    model              = "claude-sonnet-4-6",
+    model              = "claude-opus-5",
     api_key            = Sys.getenv("ANTHROPIC_API_KEY"),
     max_tokens         = 32000L,
     timeout_sec        = 600L,
@@ -195,7 +198,9 @@ submit_to_claude <- function(
   }
 
   # ---- shared request builder ------------------------------------------------
-  BETA_HEADER    <- "files-api-2025-04-14,code-execution-2025-08-25"
+  # The Files API left beta; only the code execution beta is still live.
+  # A retired beta name in this header is at best ignored and at worst a 400.
+  BETA_HEADER    <- "code-execution-2025-08-25"
   VERSION_HEADER <- "2023-06-01"
 
   .claude_req <- function(url) {
@@ -289,7 +294,11 @@ submit_to_claude <- function(
     ),
     tools = list(
       list(
-        type = "code_execution_20250825",
+        # Must stay in step with the result block the retrieval below scans
+        # for: this version returns bash_code_execution_tool_result, while
+        # the older code_execution_20250825 returns the bare
+        # code_execution_tool_result, which that scan would never match.
+        type = "code_execution_20260521",
         name = "code_execution"
       )
     )
@@ -428,11 +437,13 @@ submit_to_claude <- function(
   total_tokens  <- if (!is.na(input_tokens) && !is.na(output_tokens))
     input_tokens + output_tokens else NA_integer_
 
-  # claude-sonnet-4-6 pricing as of May 2026:
-  #   Input: $3.00 / 1M tokens | Output: $15.00 / 1M tokens
+  # claude-opus-5 pricing as of September 2026:
+  #   Input: $5.00 / 1M tokens | Output: $25.00 / 1M tokens
+  # These are the default model's rates. A run with `model` set to anything
+  # else logs a cost computed on the wrong ones.
   est_cost_usd <- sum(
-    (input_tokens  %||% 0) *  3.00 / 1e6,
-    (output_tokens %||% 0) * 15.00 / 1e6,
+    (input_tokens  %||% 0) *  5.00 / 1e6,
+    (output_tokens %||% 0) * 25.00 / 1e6,
     na.rm = TRUE
   )
 

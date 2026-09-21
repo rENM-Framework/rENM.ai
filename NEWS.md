@@ -1,4 +1,25 @@
 # rENM.ai 0.2.0.9000
+* Narrative prompts — the closing timestamp line is now specified as the
+  final body paragraph, with page headers and footers ruled out explicitly.
+  The instruction read "write the following line at the bottom of the page",
+  which Claude reasonably implemented as a Word footer, so the line repeated
+  on all four pages. ChatGPT had read the same wording as the last line of
+  the last page. Wording that two models read two ways is the prompt's fault,
+  not either model's. Validation now checks the line appears exactly once and
+  is not in a header or footer.
+* `submit_to_claude()` — corrected the code execution tool version, the beta
+  header, and the default model. The request declared
+  `code_execution_20250825` while the retrieval scanned for
+  `bash_code_execution_tool_result`, which only the current
+  `code_execution_20260521` returns; the older tool returns the bare
+  `code_execution_tool_result`, so the file-id scan could never have matched.
+  The `anthropic-beta` header still named `files-api-2025-04-14`, a beta the
+  Files API left some time ago. The default model moves from
+  `claude-sonnet-4-6` to `claude-opus-5`, and the cost estimate and
+  documentation move with it. `claude-sonnet-4-6` was both
+  previous-generation and dearer than `claude-sonnet-5`, so nothing was
+  gained by keeping it; the docs now say so. None of this had been exercised,
+  since the function has never run in the pipeline.
 * Narrative prompts — the page break before AI-ASSISTED INTERPRETATION is now
   set with `page_break_before` on the heading itself, rather than by adding an
   empty paragraph that holds a break. An empty paragraph falls onto a page of

@@ -6,7 +6,7 @@
 \usage{
 submit_to_claude(
   alpha_code,
-  model = "claude-sonnet-4-6",
+  model = "claude-opus-5",
   api_key = Sys.getenv("ANTHROPIC_API_KEY"),
   max_tokens = 32000L,
   timeout_sec = 600L,
@@ -18,7 +18,9 @@ submit_to_claude(
 \code{"CASP"}).}
 
 \item{model}{Character. Anthropic model identifier. Defaults to
-\code{"claude-sonnet-4-6"}.}
+\code{"claude-opus-5"}. Note that \code{"claude-sonnet-4-6"} is both
+previous-generation and dearer than \code{"claude-sonnet-5"}; prefer the
+latter if a cheaper model is wanted.}
 
 \item{api_key}{Character. Anthropic API key. Defaults to the value of
 the \code{ANTHROPIC_API_KEY} environment variable.}
@@ -137,12 +139,13 @@ Both are enabled automatically via the \code{anthropic-beta} header:
 
 \strong{Cost estimation}
 
-Approximate costs using claude-sonnet-4-6 pricing as of May 2026:
+Approximate costs using claude-opus-5 pricing as of September 2026:
 \itemize{
-\item Input tokens:  $3.00 / 1M tokens
-\item Output tokens: $15.00 / 1M tokens
+\item Input tokens:  $5.00 / 1M tokens
+\item Output tokens: $25.00 / 1M tokens
 }
-These are estimates only; actual billing may differ.
+These are estimates only; actual billing may differ, and they are wrong
+for any other value of \code{model}.
 }
 \examples{
 \dontrun{
