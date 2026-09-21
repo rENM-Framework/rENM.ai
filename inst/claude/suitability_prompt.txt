@@ -48,25 +48,28 @@ files, USE THAT VALUE. Do NOT recompute it from a raster. The pipeline
 computes these with cell-coverage weighting in an equal-area projection;
 a recomputed value will disagree with the tables in the same report.
 
-Compute from rasters ONLY for quantities no CSV provides.
+Every area and percentage in this report is supplied by a CSV. Read each one
+from the CSV named in that paragraph's description. Do NOT compute any area
+or percentage from a raster, for any reason.
 
-When you must compute:
-- Reproject rasters to an equal-area CRS (EPSG:5070, USA Contiguous Albers
-  Equal Area Conic), matching the projection the pipeline uses.
-- Compute per-cell area:
-   cell_area_km2 = |a11 * a22| / 1,000,000
-- Modeled extent (km²) = non-NA cell count × cell_area_km2.
-- Category areas (km²) = cell count in category × cell_area_km2.
-- Do NOT report “0.00 km²” unless the category truly contains zero cells.
+Rasters are for describing WHERE a pattern lies. They are never for
+measuring HOW MUCH.
 
-Trend classification thresholds:
-- increasing trend: value ≥ +0.0001
-- stable (near zero): −0.0001 < value < +0.0001
-- decreasing trend: value ≤ −0.0001
+NEVER report an area as 0.00 km² alongside a non-zero percentage. That
+combination is arithmetically impossible and means the area was not read
+from the CSV.
 
-These three thresholds also define “positive,” “stable,” and “negative” trend areas respectively.
+TREND SIGN CONVENTION
+The pipeline classifies each cell by the sign of its value, with no
+near-zero band and no tolerance:
+- positive: value > 0
+- negative: value < 0
+- zero:     value exactly 0
+Apply this same convention when you read a raster to describe where positive
+and negative areas lie, so the pattern you describe matches the figures you
+report. Do NOT introduce a threshold of your own.
 
-MANDATORY: DO NOT include trend classification thresholds in your descriptions.
+MANDATORY: DO NOT state the classification rule in your descriptions.
 
 -----------------------------------------------------------------------
 DATA RELIABILITY (MANDATORY)
@@ -93,10 +96,20 @@ PARAGRAPH CONTROL (HARD LIMIT)
 For EVERY paragraph:
 1. Write paragraph
 2. Count words using Python
-3. If > limit → rewrite until valid
+3. If > limit → REWRITE it shorter, then count again. Repeat until valid.
+
+NEVER truncate. Slicing a word list, cutting at the limit, or dropping the
+tail of a sentence is NOT rewriting. A paragraph that ends mid-sentence is a
+FAILURE even when its word count is correct. Every paragraph MUST end with a
+complete sentence and terminal punctuation.
+
+To fit, remove or combine whole sentences and tighten the wording. Do NOT
+drop a required figure to make room; shorten the prose around it.
 
 Limits:
 - Standard paragraphs: ≤ 125 words
+- Paragraphs 1 and 2 of CLIMATIC SUITABILITY: ≤ 150 words. Each carries six
+  figures from its CSV and needs the room to report them in whole sentences.
 - Interpretation paragraphs: ≤ 150 words
 
 -----------------------------------------------------------------------
@@ -165,7 +178,7 @@ CLIMATIC SUITABILITY (Heading 1)
 -----------------------------------------------------------------------
    This section contains EXACTLY 6 paragraphs:
 
-   **Paragraph 1: Based on the Suitability-Trend.tif file**
+   **Paragraph 1: Based on the Suitability-Trend-Percentages.csv and Suitability-Trend.tif files**
    
    Range-wide Suitability Trends (Heading 3)
 
@@ -179,16 +192,39 @@ CLIMATIC SUITABILITY (Heading 1)
    describe it as the GAP range itself, and do NOT describe it as derived
    from occurrence records.
 
+   Suitability-Trend-Percentages.csv gives every quantity this paragraph
+   needs, already computed by the pipeline. TAKE THEM FROM THE CSV. Do NOT
+   derive any of them from the raster.
+
+      extent_area_km2    area of the full rectangular extent, including
+                         cells with no data
+      valid_area_km2     area of cells carrying data; this is the
+                         denominator the percentages are taken against
+      positive_area_km2  area of positive trend
+      negative_area_km2  area of negative trend
+      percent_positive   positive area as a percent of valid_area_km2
+      percent_negative   negative area as a percent of valid_area_km2
+
+   When you state a percentage, say what it is a percentage OF.
+   percent_positive is positive_area_km2 divided by valid_area_km2. Compare
+   valid_area_km2 with extent_area_km2 and describe it accordingly:
+   - Equal: the raster covers the whole extent with no missing cells, and
+     the percentages may be described as shares of the modeled extent.
+   - Different: describe them as shares of the area carrying data, and do
+     NOT call them shares of the modeled extent.
+
+   Use the raster ONLY for where things are, never for how much.
+
    Include:
-   - Modeled extent (km²).
-   - Areas and percentages of positive and negative trends.
+   - Modeled extent (km²), from extent_area_km2.
+   - Areas and percentages of positive and negative trends, from the CSV.
    - Geographic distribution of the areas showing positive and negative trends.
    - Important positive and negative trend gradients if they exist.
    - STRICTLY descriptive. No ecological or conservation interpretation.
    - Provide relative spatial descriptions using cardinal directions rather than lat/lon.
 
 
-   **Paragraph 2: Based on the Suitability-Change-Trend.tif file**
+   **Paragraph 2: Based on the Suitability-Change-Trend-Percentages.csv and Suitability-Change-Trend.tif files**
    
    Range-wide Suitability Trend Acceleration / Deceleration (Heading 3)
 
@@ -197,8 +233,21 @@ CLIMATIC SUITABILITY (Heading 1)
    - Positive rate-of-change = acceleration, Negative rate-of-change = deceleration.
    - Explain "acceleration" and "deceleration" in the description and use those terms throughout.
    
+   Suitability-Change-Trend-Percentages.csv carries the same columns as the
+   file used in Paragraph 1, computed over the change-trend raster. TAKE THE
+   QUANTITIES FROM THE CSV. Do NOT derive them from the raster.
+
+      positive_area_km2 / percent_positive   ACCELERATION
+      negative_area_km2 / percent_negative   DECELERATION
+      valid_area_km2                         the percentage denominator
+
+   Use the same denominator wording as Paragraph 1, so the two paragraphs
+   are comparable.
+
+   Use the raster ONLY for where things are, never for how much.
+
    Include:
-   - Areas and percentages of acceleration and deceleration.
+   - Areas and percentages of acceleration and deceleration, from the CSV.
    - Geographic distribution of the areas showing acceleration and deceleration.
    - Important acceleration and deceleration gradients if they exist.
    - STRICTLY descriptive. No ecological interpretation.
@@ -220,6 +269,31 @@ CLIMATIC SUITABILITY (Heading 1)
    Include:
    - Short verbal interpretation of these metrics and a statement regarding the statistical significance of changes in longitude and latitude. DO NOT provide specific values.
    - STRICTLY descriptive. No ecological interpretation.
+
+   STATISTICAL SUPPORT RULE (MANDATORY). This rule governs this paragraph
+   and EVERY later mention of centroid movement anywhere in the document,
+   including the interpretation paragraphs.
+
+   Determine separately for latitude and for longitude whether the Bayesian
+   credible interval includes zero.
+
+   - Interval EXCLUDES zero. The change is statistically supported.
+     Directional language is permitted: "northward", "a coherent shift",
+     "tracking".
+   - Interval INCLUDES zero. The change is NOT statistically supported. Report
+     the measured displacement, bearing and velocity, and qualify them in the
+     same sentence. Use this construction:
+     "the centroid moved <distance> km on a bearing of <bearing> degrees, a
+     displacement the regression does not distinguish from no change."
+     Do NOT write "coherent", "directional", "tracking", "consistent
+     movement", or any wording implying the trend is established.
+
+   A measured displacement with an interval spanning zero is still worth
+   reporting. It is the claim of direction, not the measurement, that the
+   statistics do not support.
+
+   This rule outranks narrative flow. Where it forces an awkward sentence,
+   keep the rule.
 
    
    **Paragraph 4: Based on the Suitability-Trend-State-Analysis-Summary.csv file**
@@ -332,33 +406,24 @@ ENVIRONMENTAL STRUCTURE (Heading 1)
 
 
 -----
-REFERENCES (Heading 1)
+PAGE BREAK (MANDATORY)
 
-   Include:
-   - Provide a neatly formatted list of the MOST RELEVANT REFERENCES in the published scientific literature supporting the conclusions of this analysis. These MUST be real. Do not make anything up, do not hallucinate. Provide no more than 7 references.
-   
-   MANDATORY REFERENCE FORMATTING (python-docx):
-   Each reference MUST be formatted as follows -- no exceptions:
+Start the AI-ASSISTED INTERPRETATION section at the top of a new page by
+setting page_break_before on that heading paragraph itself:
 
-      para = doc.add_paragraph(style='Normal')
-      para.paragraph_format.left_indent       = Inches(0.5)
-      para.paragraph_format.first_line_indent = Inches(-0.5)
-      para.paragraph_format.space_after       = Pt(4)
-      para.add_run(reference_text)
+   h = doc.add_heading("AI-ASSISTED INTERPRETATION", level=1)
+   h.paragraph_format.page_break_before = True
 
-   - Do NOT use 'List Paragraph' style or any bullet/numbered list style.
-   - Do NOT use doc.add_paragraph() with a list-style argument.
-   - The hanging indent (left=0.5in, first_line=-0.5in) is REQUIRED.
-   - Inches and Pt must be imported from docx.shared.
-
------
-Insert a page break here to place this section on the last page
+Do NOT create an empty paragraph to hold a page break. When the preceding
+text happens to fill its page, that empty paragraph falls onto a page of its
+own and its break pushes the section to the page after, leaving a blank page
+in the assembled report.
 
 AI-ASSISTED INTERPRETATION (Heading 1)
 
    Include the following paragraph exactly:
 
-   The ecological and conservation interpretations presented here were generated with the assistance of Claude (Sonnet 4.6) and should be understood as a structured synthesis of rENM results rather than an independent statistical analysis. All interpretations should be evaluated by domain experts and considered as hypotheses or contextual explanations grounded in the available data.
+   The ecological and conservation interpretations presented here were generated with the assistance of Claude (<model>) and should be understood as a structured synthesis of rENM results rather than an independent statistical analysis. All interpretations should be evaluated by domain experts and considered as hypotheses or contextual explanations grounded in the available data.
 
 -----
 INCLUDED FIGURES (Heading 1)
@@ -385,11 +450,11 @@ Include the following paragraph exactly:
    Schnase, John L., Mark L. Carroll, Paul M. Montesano, and Virginia A. Seamster. "The rENM Framework: A Modular System for Reconstructing and Analyzing Long-Term Ecological Niche Dynamics." Preprint, bioRxiv, August 7, 2026. https://doi.org/10.64898/2026.08.06.741224.
 
 -----
-MANDATORY DATE/TIME:
-  - find today's date and time that the document was created
-  - use 24-hour time and show time zone
-  - write this date and time at the bottom of the page using following style:
-    (rENM Framework Version 0.2.0 - day month year - hour:minutes time zone)
+MANDATORY FOOTER:
+  - write the following line at the bottom of the page, exactly as given:
+    (rENM Framework - <timestamp>)
+  - Reproduce it verbatim. Do NOT compute, look up, or reformat the date and
+    time. They are supplied to you already formatted.
 
 -----------------------------------------------------------------------
 VALIDATION LOOP (MANDATORY)
@@ -400,14 +465,22 @@ CHECK:
 1. CLIMATIC SUITABILITY = 6 paragraphs
 2. ENVIRONMENTAL STRUCTURE = 2 paragraphs
 3. Word limits satisfied
-4. Only top 3 states included
+4. Only top 3 states included, in every sentence that names states,
+   and no state with zero hot-spot area is named at all
 5. Hot spots definition is included
 6. No extra sections
 7. Extent described as the buffered GAP range, not as the GAP range itself
    and not as occurrence-derived
 8. Interior and ring reported separately, never summed or averaged
 9. No argument resting on a single small-range state
-10. Areas taken from the CSVs wherever the CSVs provide them
+10. Every area and percentage taken from a CSV, none computed from a
+    raster, and no area reported as 0.00 km² beside a non-zero percentage
+11. No reference list or bibliography anywhere in the document
+12. Every mention of centroid movement, in every paragraph, obeys the
+    STATISTICAL SUPPORT RULE
+13. Every paragraph ends with a complete sentence and terminal punctuation.
+    Check the last character of each paragraph. A paragraph cut off at the
+    word limit fails this check even though its count is correct.
 
 IF ANY FAIL:
 - Fix

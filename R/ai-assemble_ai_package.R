@@ -89,6 +89,8 @@ assemble_ai_package <- function(
       "centroids/Centroids-Latitude-Summary.csv",
       "centroids/Centroids-Longitude-Summary.csv",
       "suitability/Suitability-Change-Trend.tif",
+      "suitability/Suitability-Change-Trend-Percentages.csv",
+      "suitability/Suitability-Trend-Percentages.csv",
       "suitability/Suitability-Trend-Boundary-Statistics.csv",
       "suitability/Suitability-Trend-State-Analysis-Summary.csv",
       "suitability/Suitability-Trend.tif",

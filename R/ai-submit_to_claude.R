@@ -228,6 +228,19 @@ submit_to_claude <- function(
   prompt <- paste(readLines(prompt_path, warn = FALSE), collapse = "\n")
   prompt <- gsub("<alpha_code>", alpha_code, prompt, fixed = TRUE)
 
+  # The model cannot look up the current time, and asking it to produce the
+  # footer stamp itself yielded a plausible date with the time zone silently
+  # dropped. Substitute it here so the stamp is correct by construction.
+  prompt <- gsub(
+    "<timestamp>",
+    sub("^0", "", format(Sys.time(), "%d %B %Y - %H:%M %Z")),
+    prompt, fixed = TRUE
+  )
+
+  # The disclosure paragraph names the model that wrote the narrative. Taking
+  # it from the argument keeps that claim true when the model is overridden.
+  prompt <- gsub("<model>", model, prompt, fixed = TRUE)
+
   zip_kb <- round(file.info(zip_path)$size / 1024, 1)
   message(sprintf("    Zip size: %.1f KB  |  Prompt chars: %s",
                   zip_kb,

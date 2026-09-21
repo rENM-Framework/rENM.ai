@@ -72,6 +72,22 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
     stop(sprintf("DOCX file not found:\n  %s", docx_path))
   }
 
+  # The model can satisfy the prompt's word cap by slicing a paragraph at the
+  # limit rather than rewriting it, which leaves a sentence cut off at a word
+  # count that passes every check the model runs on itself. Checking the
+  # document we actually received does not depend on it reporting honestly.
+  truncated <- .check_docx_paragraphs(docx_path)
+  if (length(truncated)) {
+    warning(
+      "Narrative for ", code, " has ", length(truncated),
+      " paragraph(s) ending without terminal punctuation, which usually",
+      " means the text was truncated to hit a word limit:\n",
+      paste0("  ", truncated, collapse = "\n"),
+      "\nThe PDF is still rendered. Re-run submit_to_chatgpt() to regenerate.",
+      call. = FALSE
+    )
+  }
+
   # -------------------------------------------------------------
   # 3. Check LibreOffice
   # -------------------------------------------------------------

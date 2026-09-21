@@ -60,6 +60,7 @@
 #' @importFrom httr2 request req_auth_bearer_token req_body_multipart
 #' @importFrom httr2 req_body_json req_perform resp_status req_headers
 #' @importFrom httr2 resp_body_string resp_body_json resp_body_raw req_error
+#' @importFrom httr2 req_url_query
 #'
 #' @export
 submit_to_chatgpt <- function(
@@ -98,6 +99,19 @@ submit_to_chatgpt <- function(
   # ---- Read prompt ----------------------------------------------------------
   prompt <- paste(readLines(prompt_path, warn = FALSE), collapse = "\n")
   prompt <- gsub("<alpha_code>", alpha_code, prompt, fixed = TRUE)
+
+  # The model cannot look up the current time, and asking it to produce the
+  # footer stamp itself yielded a plausible date with the time zone silently
+  # dropped. Substitute it here so the stamp is correct by construction.
+  prompt <- gsub(
+    "<timestamp>",
+    sub("^0", "", format(Sys.time(), "%d %B %Y - %H:%M %Z")),
+    prompt, fixed = TRUE
+  )
+
+  # The disclosure paragraph names the model that wrote the narrative. Taking
+  # it from the argument keeps that claim true when the model is overridden.
+  prompt <- gsub("<model>", model, prompt, fixed = TRUE)
 
   # ---- Upload bundle --------------------------------------------------------
   req_upload <- httr2::request("https://api.openai.com/v1/files") |>
@@ -150,32 +164,89 @@ submit_to_chatgpt <- function(
   )
 
   docx_path_final <- NA_character_
+  seen_paths      <- character(0)
+
+  # The container holds the uploaded bundle, every file the model unpacked
+  # from it, each intermediate written across the tool calls, and finally the
+  # document. That listing is paginated, and the document is written last, so
+  # a run that happens to create more files pushes it past the first page. A
+  # single unpaginated request retrieved it only sometimes, which is what made
+  # this step look like the model failing at random. It was not.
+  .list_container_files <- function(cid) {
+    acc   <- list()
+    after <- NULL
+    repeat {
+      req <- httr2::request(
+        paste0("https://api.openai.com/v1/containers/", cid, "/files")
+      ) |>
+        httr2::req_auth_bearer_token(api_key) |>
+        httr2::req_url_query(limit = 100)
+      if (!is.null(after)) req <- httr2::req_url_query(req, after = after)
+
+      body <- httr2::resp_body_json(httr2::req_perform(req))
+      dat  <- body$data %||% list()
+      acc  <- c(acc, dat)
+
+      if (!isTRUE(body$has_more) || !length(dat)) break
+      after <- dat[[length(dat)]]$id
+    }
+    acc
+  }
+
+  want <- basename(docx_path)
 
   for (cid in container_ids) {
 
-    files <- httr2::request(
-      paste0("https://api.openai.com/v1/containers/", cid, "/files")
+    files <- .list_container_files(cid)
+    paths <- vapply(files, function(f) f$path %||% "", character(1))
+    seen_paths <- c(seen_paths, paths)
+
+    # Prefer the exact filename the prompt demands; fall back to any .docx so
+    # a renamed output is still recovered rather than silently lost.
+    idx <- which(basename(paths) == want)
+    if (!length(idx)) idx <- which(grepl("\\.docx$", paths, ignore.case = TRUE))
+    if (!length(idx)) next
+
+    f <- files[[idx[[length(idx)]]]]
+
+    raw <- httr2::request(
+      paste0("https://api.openai.com/v1/containers/", cid,
+             "/files/", f$id, "/content")
     ) |>
       httr2::req_auth_bearer_token(api_key) |>
       httr2::req_perform() |>
-      httr2::resp_body_json()
+      httr2::resp_body_raw()
 
-    for (f in files$data) {
-      if (grepl("\\.docx$", f$path, ignore.case = TRUE)) {
+    writeBin(raw, docx_path)
+    docx_path_final <- docx_path
+    break
+  }
 
-        raw <- httr2::request(
-          paste0("https://api.openai.com/v1/containers/", cid,
-                 "/files/", f$id, "/content")
-        ) |>
-          httr2::req_auth_bearer_token(api_key) |>
-          httr2::req_perform() |>
-          httr2::resp_body_raw()
-
-        writeBin(raw, docx_path)
-        docx_path_final <- docx_path
-        break
-      }
-    }
+  # A call that produces no document has still cost money and several minutes,
+  # and the response is the only evidence of why. Returning quietly threw it
+  # away and surfaced the problem two functions later as a missing file, with
+  # nothing left to diagnose. Keep the response and say so here instead.
+  if (is.na(docx_path_final)) {
+    diag_path <- file.path(
+      chatgpt_dir, sprintf("%s-response.json", alpha_code)
+    )
+    try(
+      writeLines(httr2::resp_body_string(resp), diag_path),
+      silent = TRUE
+    )
+    item_types <- unique(unlist(lapply(resp_json$output, function(x) x$type)))
+    warning(
+      "No .docx was returned for ", alpha_code, ".\n",
+      "  status          : ", resp_json$status %||% "unknown", "\n",
+      "  incomplete      : ", resp_json$incomplete_details$reason %||% "none", "\n",
+      "  output items    : ",
+      if (length(item_types)) paste(item_types, collapse = ", ") else "none", "\n",
+      "  containers seen : ", length(container_ids), "\n",
+      "  files in them   : ",
+      if (length(seen_paths)) paste(basename(seen_paths), collapse = ", ") else "none", "\n",
+      "  raw response    : ", diag_path,
+      call. = FALSE
+    )
   }
 
   # ---- Log ------------------------------------------------------------------
