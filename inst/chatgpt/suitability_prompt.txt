@@ -308,6 +308,10 @@ CLIMATIC SUITABILITY (Heading 1)
 
    Include:
    - The positive percentage for each zone, and the difference between them.
+   - Whether each zone is majority positive or majority negative. A zone can
+     be less positive than the other and still be improving overall. Saying
+     only that one is "less positive" invites a reader to assume it is
+     declining, so state which side of 50% each zone falls on.
    - The hot spot percentage for each zone.
    - A plain statement of which way the comparison runs: whether the ring is
      more or less positive than the interior.
@@ -328,16 +332,29 @@ CLIMATIC SUITABILITY (Heading 1)
    - Does the direction of centroid movement agree with where the positive
      and negative trends actually lie? Say so if it does, and say so if it
      does not.
-   - Does the boundary comparison support or contradict a shifting range? A
-     ring more positive than the interior is consistent with an advancing
-     leading edge. A ring less positive indicates the surrounding zone is
-     deteriorating faster than the occupied range, which constrains movement
-     rather than enabling it. Do NOT assume either direction; read what the
-     data shows.
+   - Does the boundary comparison support or contradict a shifting range?
+     Read both zones' actual values before characterizing the difference:
+       * Ring more positive than the interior: consistent with conditions
+         improving where the species would expand into.
+       * Ring less positive but STILL MAJORITY POSITIVE: conditions are
+         improving in both zones, more so inside the range. This is NOT
+         deterioration outside the range and must not be described as such.
+       * Ring less positive AND majority negative: conditions outside are
+         declining while the interior holds up.
+     Do NOT assume a direction, and do not turn a difference in degree into
+     a difference in kind.
    - Where hot spots concentrate, say what that implies about where decline
      is not merely present but gathering pace.
 
    Constraints:
+   - The ring is a fixed 250 km collar, not a map of habitat. Much of it may
+     be unusable to the species for reasons that have nothing to do with
+     climate. A trend there describes climatic suitability, not whether the
+     species could occupy the ground. Do NOT claim range expansion or
+     contraction from the boundary comparison alone.
+   - The size of the interior-to-ring difference has no established
+     reference across species. Report it and say which way it runs. Do NOT
+     characterize it as large, small, striking, or pronounced.
    - Base claims on the data in this package and on published literature you
      are confident is real. Do not fabricate references, values, or
      mechanisms.
@@ -468,6 +485,12 @@ CHECK:
     word limit fails this check even though its count is correct.
 14. The closing (rENM Framework - ...) line appears exactly once, as the last
     body paragraph, and is NOT in a page header or footer.
+15. The boundary paragraph states whether each zone is majority positive or
+    majority negative, and a ring that is less positive than the interior
+    while still majority positive is NOT described as deteriorating.
+16. No claim of range expansion or contraction rests on the boundary
+    comparison alone, and the size of the interior-to-ring difference is not
+    characterized as large or small.
 
 IF ANY FAIL:
 - Fix

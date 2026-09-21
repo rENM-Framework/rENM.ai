@@ -1,4 +1,20 @@
 # rENM.ai 0.2.0.9000
+* Narrative prompts — corrected the boundary interpretation guidance, which
+  overstated what the comparison shows. The prompt told the model that a ring
+  less positive than the interior "indicates the surrounding zone is
+  deteriorating faster than the occupied range". That is false whenever the
+  ring is itself majority positive, as Cassin's Sparrow's is at 57.23%, and
+  the model was following the instruction faithfully. The guidance now
+  separates a ring that is less positive but still improving from one that is
+  actually declining, and the descriptive paragraph must state which side of
+  50% each zone falls on so "less positive" cannot be read as "declining".
+* Narrative prompts — two constraints added to the interpretation paragraph.
+  The ring is a fixed 250 km collar rather than a map of habitat, and much of
+  it may be unusable for reasons unrelated to climate, so no claim of range
+  expansion or contraction may rest on the boundary comparison alone. And the
+  size of the interior-to-ring difference has no established cross-species
+  reference yet, so it is reported and given a direction but not called large
+  or small. Validation checks both.
 * Narrative prompts — paragraph 1 must now state `valid_area_km2` as its own
   figure whenever it differs from `extent_area_km2`. Greater Roadrunner was
   the first species whose extent carries no-data cells, its range reaching
