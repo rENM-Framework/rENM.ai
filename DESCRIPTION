@@ -20,5 +20,6 @@ Imports:
   rENM.core,
   curl,
   httr2,
+  officer,
   utils
 Config/roxygen2/version: 8.0.0

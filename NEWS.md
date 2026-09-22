@@ -1,4 +1,14 @@
 # rENM.ai 0.2.0.9000
+* Added `assemble_coversheet()`, which builds the
+  `<alpha_code>-Suitability-Trend-Analysis.docx` page without calling a
+  language model: title block, the included-figures list, the framework
+  citation, and a timestamp, nothing else. `rENM()` calls it when `ai =
+  NULL` and as the fallback when `submit_to_chatgpt()` or
+  `submit_to_claude()` fails, so a report without AI assistance still gets
+  a title page. Colors, fonts, and sizes are set directly with
+  `officer::fp_text()`/`fp_par()` to match python-docx's default theme, the
+  one `submit_to_chatgpt()`/`submit_to_claude()` render into, rather than
+  relying on named Word styles that could drift from it.
 * Narrative prompts — the boundary paragraph's majority-status requirement
   produced slot-filled prose in three of six reports: "the interior is
   majority negative, while the ring is majority negative" joined two agreeing
