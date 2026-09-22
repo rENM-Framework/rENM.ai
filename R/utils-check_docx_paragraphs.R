@@ -1,32 +1,3 @@
-#' Check a generated narrative for truncated paragraphs
-#'
-#' Reads the paragraph text out of a \code{.docx} and reports any body
-#' paragraph that does not end in terminal punctuation.
-#'
-#' @details
-#' The narrative prompt caps paragraph length and instructs the model to
-#' rewrite an over-long paragraph until it fits. A model can satisfy that
-#' instruction by slicing the paragraph at the limit instead, which leaves a
-#' sentence cut off mid-phrase at a word count that passes every check the
-#' model itself performs. Three paragraphs shipped that way before anyone
-#' noticed, each exactly at the limit.
-#'
-#' The check is deterministic and runs after the document is in hand, so it
-#' does not depend on the model reporting its own compliance.
-#'
-#' Headings, title lines, and the figure list legitimately end without
-#' punctuation, so only paragraphs of at least \code{min_words} are examined.
-#' Real body paragraphs in this report run from roughly 50 to 150 words.
-#'
-#' @param docx_path Character. Path to the \code{.docx} to inspect.
-#' @param min_words Integer. Paragraphs shorter than this are treated as
-#'   headings or list items and skipped.
-#'
-#' @return Character vector of offending paragraphs, truncated for display.
-#'   Empty when every body paragraph is well formed.
-#'
-#' @keywords internal
-#' @noRd
 #' Paragraph text of a .docx, one string per paragraph
 #'
 #' Shared by the checks below so both read the document the same way.
@@ -74,6 +45,36 @@
   trimws(txt)
 }
 
+
+#' Check a generated narrative for truncated paragraphs
+#'
+#' Reads the paragraph text out of a \code{.docx} and reports any body
+#' paragraph that does not end in terminal punctuation.
+#'
+#' @details
+#' The narrative prompt caps paragraph length and instructs the model to
+#' rewrite an over-long paragraph until it fits. A model can satisfy that
+#' instruction by slicing the paragraph at the limit instead, which leaves a
+#' sentence cut off mid-phrase at a word count that passes every check the
+#' model itself performs. Three paragraphs shipped that way before anyone
+#' noticed, each exactly at the limit.
+#'
+#' The check is deterministic and runs after the document is in hand, so it
+#' does not depend on the model reporting its own compliance.
+#'
+#' Headings, title lines, and the figure list legitimately end without
+#' punctuation, so only paragraphs of at least \code{min_words} are examined.
+#' Real body paragraphs in this report run from roughly 50 to 150 words.
+#'
+#' @param docx_path Character. Path to the \code{.docx} to inspect.
+#' @param min_words Integer. Paragraphs shorter than this are treated as
+#'   headings or list items and skipped.
+#'
+#' @return Character vector of offending paragraphs, truncated for display.
+#'   Empty when every body paragraph is well formed.
+#'
+#' @keywords internal
+#' @noRd
 .check_docx_paragraphs <- function(docx_path, min_words = 25L) {
   txt <- .docx_paragraph_text(docx_path)
   if (!length(txt)) return(character(0))
