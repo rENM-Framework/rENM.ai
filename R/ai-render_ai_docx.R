@@ -98,6 +98,19 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
     )
   }
 
+  # Known prose faults, not a general quality judgement. Warns: the report
+  # stays readable and every figure is right.
+  prose <- .check_docx_prose(docx_path)
+  if (length(prose)) {
+    warning(
+      "Narrative for ", code, " has ", length(prose),
+      " prose fault(s):\n",
+      paste0("  ", prose, collapse = "\n"),
+      "\nRe-run submit_to_chatgpt() if the wording matters.",
+      call. = FALSE
+    )
+  }
+
   truncated <- .check_docx_paragraphs(docx_path)
   if (length(truncated)) {
     warning(

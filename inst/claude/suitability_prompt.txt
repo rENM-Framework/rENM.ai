@@ -117,6 +117,27 @@ STYLE AND TONE REQUIREMENTS
 -----------------------------------------------------------------------
 - Use the narrative voice, pacing, and ecological vocabulary characteristic of scientific ornithological journals.
 
+You are assembling these sentences in Python, which makes it easy to emit
+text that satisfies every content rule above and still reads as though a
+machine wrote it. It must not. Every sentence must be grammatical, idiomatic
+English that a copy editor would pass.
+
+In particular:
+- Do NOT join two agreeing statements with a contrastive conjunction.
+  "The interior is majority negative, while the ring is majority negative"
+  is wrong; "Both zones are majority negative" is right.
+- Do NOT use "respectively" unless two or more distinct items are being
+  matched in order. "Majority positive and positive, respectively" is not
+  English.
+- Do NOT leave the seams of a template showing: no repeated sentence frames
+  within a paragraph, no clause that exists only to hold a value, no
+  enumeration where prose is called for.
+- Vary sentence structure. A paragraph in which every sentence opens the
+  same way reads as generated.
+
+Before saving, read each assembled paragraph back as prose. Fix anything you
+would not publish under your own name.
+
 Forbidden:
 - No additional sections.
 - No tables, figures, or visualization section.
@@ -333,15 +354,32 @@ CLIMATIC SUITABILITY (Heading 1)
    it never looks beyond the boundary. This comparison does.
 
    Include:
-   - The positive percentage for each zone, and the difference between them.
+   - The positive percentage for each zone.
+   - The difference between them, as an UNSIGNED magnitude paired with a
+     direction. Write "the ring is 14.45 percentage points less positive
+     than the interior", never "a difference of -14.45 percentage points".
+     A signed number is ambiguous unless the reader knows which way the
+     subtraction ran, and the sign must not vary between reports.
    - Whether each zone is majority positive or majority negative. A zone can
-     be less positive than the other and still be improving overall. Saying
-     only that one is "less positive" invites a reader to assume it is
-     declining, so state which side of 50% each zone falls on.
+     be less positive than the other and still be improving overall, and
+     saying only that one is "less positive" invites a reader to assume it
+     is declining.
+     Phrase this as ordinary prose, not as a filled-in template:
+       * Both above 50%: "Both zones are majority positive."
+       * Both below 50%: "Both zones are majority negative."
+       * Differing: "The interior is majority positive while the ring is
+         majority negative", or the reverse as the data requires.
+     Do NOT use a contrastive conjunction such as "while" or "whereas" to
+     join two statements that agree. Do NOT write constructions such as
+     "majority positive and positive, respectively".
    - The hot spot percentage for each zone.
    - A plain statement of which way the comparison runs: whether the ring is
      more or less positive than the interior.
    - STRICTLY descriptive. No ecological interpretation.
+
+   Write this paragraph as connected prose. Every sentence must read as
+   though written by a person, not assembled from slots. Before saving, read
+   it back: if any sentence would not survive a copy editor, rewrite it.
 
    MANDATORY: Do NOT sum, average, or otherwise combine the two zones. They
    are separate regions answering different questions.
@@ -517,7 +555,10 @@ CHECK:
 16. No claim of range expansion or contraction rests on the boundary
     comparison alone, and the size of the interior-to-ring difference is not
     characterized as large or small.
-17. No unsubstituted placeholder appears anywhere in the document. Search the
+17. Every paragraph reads as literate English: no contrastive conjunction
+    joining agreeing statements, no stray "respectively", no visible template
+    seams, no repeated sentence frames. Read each one back before saving.
+18. No unsubstituted placeholder appears anywhere in the document. Search the
     assembled text for "{" before saving. A Python string built with a brace
     placeholder but without the f prefix writes the placeholder literally,
     and where it stands in for a number the report is missing data. Build

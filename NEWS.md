@@ -1,4 +1,25 @@
 # rENM.ai 0.2.0.9000
+* Narrative prompts — the boundary paragraph's majority-status requirement
+  produced slot-filled prose in three of six reports: "the interior is
+  majority negative, while the ring is majority negative" joined two agreeing
+  statements with a contrastive conjunction, "both zones are majority
+  positive and positive, respectively" is not English, and one report gave
+  "a difference of -18.53 percentage points" where the other five gave
+  unsigned magnitudes. The instruction now supplies the phrasing for each
+  case, requires the difference as an unsigned magnitude with a direction
+  word, and forbids the two constructions by name. The numbers were correct
+  throughout; this is wording only.
+* Narrative prompts — expanded the style section. The narrative is assembled
+  in Python, which makes it easy to satisfy every content rule and still read
+  as though a machine wrote it. The prompt now says so, forbids contrastive
+  conjunctions between agreeing clauses, stray "respectively", visible
+  template seams and repeated sentence frames, and requires the model to read
+  each paragraph back as prose before saving.
+* `render_ai_docx()` — added `.check_docx_prose()`, which warns on the three
+  constructions above. Not a general judge of writing, which no regular
+  expression can be; it exists so a fault already seen cannot return
+  unnoticed. Verified against the exact sentences that shipped: three of
+  three caught, none of four correct sentences flagged.
 * `render_ai_docx()` — now stops when the narrative contains an unsubstituted
   placeholder, via a new `.check_docx_placeholders()`. The model assembles the
   text in Python; a string built with a brace placeholder but without the `f`
