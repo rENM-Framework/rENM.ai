@@ -1,4 +1,17 @@
 # rENM.ai 0.2.0.9000
+* `render_ai_docx()` — now stops when the narrative contains an unsubstituted
+  placeholder, via a new `.check_docx_placeholders()`. The model assembles the
+  text in Python; a string built with a brace placeholder but without the `f`
+  prefix writes the placeholder into the document. Three of six reports
+  carried one: `{ring_phrase}`, `{neg_area} km²`, `{fmt(hot_int)}%`,
+  `{fmt(ring_pos)}%`. Two stand where a figure belongs, so those reports were
+  missing data, not merely reading oddly. Nothing in the prompt can prevent
+  this reliably, because the model cannot see its own rendered output; the
+  prompt gains a validation item, but the check on the returned document is
+  what actually catches it. It stops rather than warns: a warning scrolls
+  past in an unattended batch, which is how three of six shipped with one.
+  The truncation check still only warns, since that report is readable. The paragraph-text extraction is now shared
+  between this check and the truncation check.
 * Narrative prompts — corrected the boundary interpretation guidance, which
   overstated what the comparison shows. The prompt told the model that a ring
   less positive than the interior "indicates the surrounding zone is

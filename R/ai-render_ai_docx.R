@@ -76,6 +76,28 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
   # limit rather than rewriting it, which leaves a sentence cut off at a word
   # count that passes every check the model runs on itself. Checking the
   # document we actually received does not depend on it reporting honestly.
+  # A brace placeholder reaches the document when the model builds a string
+  # in Python without the `f` prefix. Two of the four seen stood in for
+  # figures, so the report was missing data rather than merely reading oddly.
+  # The model cannot see its own rendered output, so only this check can
+  # catch it.
+  # This stops rather than warns. Where a placeholder stands in for a number
+  # the report is missing data, and in an unattended batch a warning scrolls
+  # past: that is how three of six reports shipped with one. Truncation below
+  # only warns, because the report is still readable and complete.
+  placeholders <- .check_docx_placeholders(docx_path)
+  if (length(placeholders)) {
+    stop(
+      "Narrative for ", code, " contains ", length(placeholders),
+      " unsubstituted placeholder(s). Where these stand in for a number the",
+      " report is missing data:\n",
+      paste0("  ", placeholders, collapse = "\n"),
+      "\nThe .docx is on disk but no PDF was produced. Re-run",
+      " submit_to_chatgpt(\"", code, "\") to regenerate the narrative.",
+      call. = FALSE
+    )
+  }
+
   truncated <- .check_docx_paragraphs(docx_path)
   if (length(truncated)) {
     warning(

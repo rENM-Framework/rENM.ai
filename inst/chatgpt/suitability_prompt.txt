@@ -491,6 +491,12 @@ CHECK:
 16. No claim of range expansion or contraction rests on the boundary
     comparison alone, and the size of the interior-to-ring difference is not
     characterized as large or small.
+17. No unsubstituted placeholder appears anywhere in the document. Search the
+    assembled text for "{" before saving. A Python string built with a brace
+    placeholder but without the f prefix writes the placeholder literally,
+    and where it stands in for a number the report is missing data. Build
+    every sentence with an f-string or .format(), and verify the rendered
+    text, not the template.
 
 IF ANY FAIL:
 - Fix

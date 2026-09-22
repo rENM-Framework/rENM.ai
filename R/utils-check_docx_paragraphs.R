@@ -27,7 +27,13 @@
 #'
 #' @keywords internal
 #' @noRd
-.check_docx_paragraphs <- function(docx_path, min_words = 25L) {
+#' Paragraph text of a .docx, one string per paragraph
+#'
+#' Shared by the checks below so both read the document the same way.
+#'
+#' @keywords internal
+#' @noRd
+.docx_paragraph_text <- function(docx_path) {
   if (!file.exists(docx_path)) return(character(0))
 
   tmp <- tempfile("docxchk")
@@ -65,7 +71,13 @@
     unescape(paste0(gsub("^<w:t[^>]*>|</w:t>$", "", runs), collapse = ""))
   }, character(1), USE.NAMES = FALSE)
 
-  txt <- trimws(txt)
+  trimws(txt)
+}
+
+.check_docx_paragraphs <- function(docx_path, min_words = 25L) {
+  txt <- .docx_paragraph_text(docx_path)
+  if (!length(txt)) return(character(0))
+
   n_words <- lengths(strsplit(txt, "\\s+"))
 
   # Allow one closing quote after the stop, e.g. ... data."
@@ -83,4 +95,45 @@
     sprintf("(%d words) ...%s", n_words[i],
             substr(txt[i], max(1L, nchar(txt[i]) - 60L), nchar(txt[i])))
   }, character(1))
+}
+
+#' Check a generated narrative for unsubstituted placeholders
+#'
+#' @details
+#' The model assembles the narrative in Python and writes it with python-docx.
+#' A string built with a brace placeholder but without the `f` prefix emits the
+#' placeholder literally, and it lands in the document where a number should
+#' be. Three of six reports carried one: `{neg_area} km2`, `{fmt(hot_int)}%`,
+#' `{ring_phrase}`. Two of those stand in for figures, so the report is missing
+#' data rather than merely reading oddly.
+#'
+#' Nothing in the prompt can prevent this reliably, since the model has no way
+#' to see its own rendered output. Checking the document we received does not
+#' depend on it noticing.
+#'
+#' @param docx_path Character. Path to the \code{.docx} to inspect.
+#'
+#' @return Character vector of the placeholders found, with a little
+#'   surrounding text. Empty when the document is clean.
+#'
+#' @keywords internal
+#' @noRd
+.check_docx_placeholders <- function(docx_path) {
+  txt <- .docx_paragraph_text(docx_path)
+  if (!length(txt)) return(character(0))
+
+  # Any braced token, plus the angle-bracket placeholders the prompt itself
+  # uses, in case one survives substitution.
+  pat <- "\\{[^{}\n]{1,60}\\}|<(alpha_code|model|timestamp)>"
+  out <- character(0)
+  for (t in txt) {
+    m <- regmatches(t, gregexpr(pat, t, perl = TRUE))[[1L]]
+    for (hit in m) {
+      at <- regexpr(hit, t, fixed = TRUE)
+      lo <- max(1L, at - 40L)
+      hi <- min(nchar(t), at + attr(at, "match.length") + 30L)
+      out <- c(out, sprintf("%s  in: ...%s...", hit, substr(t, lo, hi)))
+    }
+  }
+  unique(out)
 }
