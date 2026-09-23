@@ -85,7 +85,7 @@
   # perl = TRUE matters: under R's default TRE engine a backslash is not an
   # escape inside a bracket expression, so a "]" written there silently
   # changes what the class matches and every well-formed paragraph fails.
-  well_formed <- grepl("[.!?][\"')”]?$", txt, perl = TRUE) |
+  well_formed <- grepl("[.!?][\"')\u201d]?$", txt, perl = TRUE) |
     # A paragraph ending in a bare URL is complete, not truncated.
     grepl("https?://\\S+$", txt, perl = TRUE)
 
@@ -181,7 +181,7 @@
     ),
     list(
       what = "signed difference; use an unsigned magnitude and a direction",
-      pat  = "difference of\\s*[−-][0-9]"
+      pat  = "difference of\\s*[\u2212-][0-9]"
     )
   )
 

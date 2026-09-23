@@ -153,7 +153,7 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
   }
 
   # -------------------------------------------------------------
-  # 4. Convert DOCX → PDF
+  # 4. Convert DOCX to PDF
   # -------------------------------------------------------------
   if (verbose) {
     message("[render_ai_docx] Converting DOCX to PDF:")

@@ -1,4 +1,15 @@
 # rENM.ai 0.2.0.9000
+* Replaced four non-ASCII characters in R source with `\uXXXX` escapes, which
+  `R CMD check` reported as a WARNING and which halted `devtools::check()`.
+  Three were inside string literals and so were the ones flagged: an en dash
+  in the coversheet's `1980-2024` title line, and a right curly quote and a
+  Unicode minus sign inside regular expressions in
+  `.check_docx_paragraphs()` and `.check_docx_prose()`. The fourth was an
+  arrow in a comment, which the check tolerates; it was replaced anyway so
+  the package carries no non-ASCII at all. Behavior is unchanged, since R
+  converts each escape to the same character at parse time; the two affected
+  regexes were confirmed to still match a curly close-quote and both the
+  Unicode minus and an ASCII hyphen.
 * Added `assemble_coversheet()`, which builds the
   `<alpha_code>-Suitability-Trend-Analysis.docx` page without calling a
   language model: title block, the included-figures list, the framework

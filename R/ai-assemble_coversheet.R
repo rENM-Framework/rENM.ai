@@ -121,7 +121,7 @@ assemble_coversheet <- function(alpha_code) {
     fp_p = title_par
   ))
   doc <- officer::body_add_fpar(doc, officer::fpar(
-    officer::ftext("1980–2024", title_fmt),
+    officer::ftext("1980\u20132024", title_fmt),
     fp_p = title_par_ruled
   ))
 
