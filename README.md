@@ -111,7 +111,7 @@ render_ai_docx()             <- DOCX → PDF via LibreOffice
 
 Both providers require separate API accounts billed per token, independently of any web subscription:
 
-- **Anthropic:** obtain a key at <https://console.anthropic.com> and set `ANTHROPIC_API_KEY`.
+- **Anthropic:** obtain a key at <https://platform.claude.com/> and set `ANTHROPIC_API_KEY`.
 - **OpenAI:** obtain a key at <https://platform.openai.com> and set `OPENAI_API_KEY`.
 
 ## Role in the rENM Framework

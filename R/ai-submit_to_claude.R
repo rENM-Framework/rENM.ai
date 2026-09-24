@@ -60,7 +60,7 @@
 #' \itemize{
 #'   \item Uses \code{api_key}, defaulting to
 #'         \code{Sys.getenv("ANTHROPIC_API_KEY")}.
-#'   \item Obtain an API key from \url{https://console.anthropic.com}.
+#'   \item Obtain an API key from \url{https://platform.claude.com/}.
 #'   \item This requires a separate Anthropic API account billed per
 #'         token, independently of any claude.ai subscription.
 #' }
