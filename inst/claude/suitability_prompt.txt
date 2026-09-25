@@ -347,8 +347,14 @@ CLIMATIC SUITABILITY (Heading 1)
    ring surrounding it: the zone lying between the range polygon and that
    same polygon buffered outward by 250 km. The two zones are disjoint. It
    contains two rows, "interior" and "ring", each giving area, the
-   percentages of area with positive and negative trends, and hot spot area
-   and percentage.
+   percentages of area with positive and negative trends, the median slope
+   and the median absolute slope in suitability units per year, and hot spot
+   area and percentage.
+
+   The percentages count area above and below zero and carry no information
+   about how large the trends are. The two median columns do. A zone whose
+   slopes hover around zero yields a percentage near 50 that means no signal
+   was detected, not that gains and losses are balanced.
 
    A static range polygon cannot reveal a range edge that is moving, because
    it never looks beyond the boundary. This comparison does.
@@ -364,9 +370,18 @@ CLIMATIC SUITABILITY (Heading 1)
      be less positive than the other and still be improving overall, and
      saying only that one is "less positive" invites a reader to assume it
      is declining.
-     Phrase this as ordinary prose, not as a filled-in template:
-       * Both above 50%: "Both zones are majority positive."
-       * Both below 50%: "Both zones are majority negative."
+     FIRST apply this test to each zone, using the numbers in the file:
+       * If the zone's positive percentage is at least 45 and at most 55,
+         do NOT call it majority positive or majority negative. Write that
+         the zone shows no detectable directional trend. Saying a ring at
+         50.88% is "majority positive" asserts a direction the data does
+         not support, and that sentence has shipped in a report.
+       * If the zone's med_abs_slope is less than half the other zone's,
+         add that its trends are correspondingly weaker in magnitude.
+     Then, for any zone not caught by the test above, phrase this as
+     ordinary prose, not as a filled-in template:
+       * Both above 55%: "Both zones are majority positive."
+       * Both below 45%: "Both zones are majority negative."
        * Differing: "The interior is majority positive while the ring is
          majority negative", or the reverse as the data requires.
      Do NOT use a contrastive conjunction such as "while" or "whereas" to

@@ -1,4 +1,11 @@
 # rENM.ai 0.2.0.9000
+* Both prompts now describe the two median-slope columns in the boundary
+  statistics file and forbid calling a zone between 45 and 55 percent
+  positive "majority positive" or "majority negative", requiring instead
+  that it be reported as showing no detectable directional trend. A shipped
+  narrative had described a ring at 50.88 percent, median slope -3e-07, as
+  majority positive. The threshold is supplied rather than left to judgement,
+  as with every other numeric rule in these prompts.
 * The verbatim check compares by equality rather than containment, and now
   covers every supplied block on the opening page rather than the
   reproducibility text alone: the section headings, the eight figure
