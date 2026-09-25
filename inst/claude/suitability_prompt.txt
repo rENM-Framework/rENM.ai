@@ -489,6 +489,12 @@ AI-ASSISTED INTERPRETATION (Heading 1)
 -----
 INCLUDED FIGURES (Heading 1)
 
+   Do NOT add a trailing period, or any other punctuation, to a heading or
+   to a list entry. A run has come back with every heading and every figure
+   entry given a period, including a citation heading reading "see:.". These
+   strings are checked against what was supplied and any addition fails the
+   render, so the document is rejected rather than shipped.
+
    Include the following list exactly, with no page numbers. Page numbers
    are deliberately omitted: this narrative is itself one section of the
    assembled report, so its own length determines where the later pages

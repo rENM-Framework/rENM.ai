@@ -95,24 +95,11 @@ assemble_coversheet <- function(alpha_code) {
                                  padding.bottom = 0, line_spacing = 1.15)
 
   # Same figure list and citation the narrative prompt requires verbatim, so
-  # the two versions of this page read as interchangeable front matter.
-  figures <- c(
-    "Climatic Suitability Time Series",
-    "Range Time Series",
-    "Climatic Suitability Trends",
-    "State-Level Suitability Trend and HotSpot Summary",
-    "Climatic Suitability Trend with Centroid Shift",
-    "Variable Contribution Trends",
-    "Predictor Variable Trends",
-    "rENM Framework MERRA Variables"
-  )
-
-  citation <- paste0(
-    "Schnase, John L., Mark L. Carroll, Paul M. Montesano, and Virginia A. ",
-    "Seamster. \"The rENM Framework: A Modular System for Reconstructing ",
-    "and Analyzing Long-Term Ecological Niche Dynamics.\" Preprint, ",
-    "bioRxiv, August 7, 2026. https://doi.org/10.64898/2026.08.06.741224."
-  )
+  # the two versions of this page read as interchangeable front matter, and
+  # so .check_docx_fixed_text() compares a provider's copy against what this
+  # page renders rather than against a second transcription of it.
+  figures  <- .report_figures()
+  citation <- .framework_citation()
 
   # Same substitution submit_to_chatgpt()/submit_to_claude() apply to the
   # <timestamp> placeholder, so the closing line reads identically either way.
@@ -134,7 +121,7 @@ assemble_coversheet <- function(alpha_code) {
   ))
 
   doc <- officer::body_add_fpar(doc, officer::fpar(
-    officer::ftext("INCLUDED FIGURES", heading_fmt), fp_p = heading_par
+    officer::ftext(.report_headings()[[1L]], heading_fmt), fp_p = heading_par
   ))
   # Set as a tight bulleted list rather than eight spaced body paragraphs.
   # On the provider path this list shares the narrative's final page with the
@@ -162,10 +149,7 @@ assemble_coversheet <- function(alpha_code) {
   }
 
   doc <- officer::body_add_fpar(doc, officer::fpar(
-    officer::ftext(
-      "For additional information about the rENM Framework, see:",
-      heading_fmt
-    ),
+    officer::ftext(.report_headings()[[2L]], heading_fmt),
     fp_p = heading_par
   ))
   doc <- officer::body_add_fpar(doc, officer::fpar(

@@ -1,4 +1,16 @@
 # rENM.ai 0.2.0.9000
+* The verbatim check compares by equality rather than containment, and now
+  covers every supplied block on the opening page rather than the
+  reproducibility text alone: the section headings, the eight figure
+  entries, the reproducibility heading and paragraphs, and the framework
+  citation. The first version asked whether the document contained the
+  expected string, so it accepted anything appended to it. On its second
+  live run a model returned all twelve of these with a trailing period
+  added, including a citation heading reading "... see:.", and every one
+  passed. The figure list, citation and headings now come from three
+  internal helpers used both to render the coversheet and to check a
+  provider's copy, so the two cannot be transcriptions of each other. Both
+  prompts also forbid adding punctuation to a heading or list entry.
 * Every report's opening page now carries a REPRODUCIBILITY section, placed
   between the figure list and the citation so the citation and closing
   timestamp stay together as a colophon. It states that the report is one

@@ -92,3 +92,60 @@
 
   vals[[1L]]
 }
+
+#' The figure list carried on every report's opening page
+#'
+#' @details
+#' One source for the eight entries, used by \code{assemble_coversheet()} to
+#' render them and by \code{.check_docx_fixed_text()} to verify a provider
+#' reproduced them. The prompt carries the same list as literal text; that
+#' copy is what the check exists to police.
+#'
+#' @return Character vector of eight figure names.
+#'
+#' @keywords internal
+#' @noRd
+.report_figures <- function() {
+  c(
+    "Climatic Suitability Time Series",
+    "Range Time Series",
+    "Climatic Suitability Trends",
+    "State-Level Suitability Trend and HotSpot Summary",
+    "Climatic Suitability Trend with Centroid Shift",
+    "Variable Contribution Trends",
+    "Predictor Variable Trends",
+    "rENM Framework MERRA Variables"
+  )
+}
+
+#' The framework citation carried on every report's opening page
+#'
+#' @return Character scalar.
+#'
+#' @keywords internal
+#' @noRd
+.framework_citation <- function() {
+  paste0(
+    "Schnase, John L., Mark L. Carroll, Paul M. Montesano, and Virginia A. ",
+    "Seamster. \"The rENM Framework: A Modular System for Reconstructing ",
+    "and Analyzing Long-Term Ecological Niche Dynamics.\" Preprint, ",
+    "bioRxiv, August 7, 2026. https://doi.org/10.64898/2026.08.06.741224."
+  )
+}
+
+#' Headings that must appear exactly on the opening page
+#'
+#' @details
+#' \code{"AI-ASSISTED INTERPRETATION"} is provider-only; the coversheet has
+#' no such section. It is therefore checked only when the document already
+#' contains a paragraph beginning with it, which keeps one check correct for
+#' both paths without needing to be told which one produced the file.
+#'
+#' @return Character vector.
+#'
+#' @keywords internal
+#' @noRd
+.report_headings <- function() {
+  c("INCLUDED FIGURES",
+    "For additional information about the rENM Framework, see:")
+}
