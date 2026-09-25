@@ -1,4 +1,11 @@
 # rENM.ai 0.2.0.9000
+* Both provider prompts described the state-level positive and negative
+  figures as "percentages of range area". `create_state_trend_analysis()`
+  now takes them over the part of the state's range carrying trend data,
+  so the description is updated to say so. The prompt does not ask the
+  model to report these figures, so no shipped narrative was wrong; the
+  description is corrected to keep the file's stated convention matching
+  the file. The claude and chatgpt prompts carry identical wording.
 * Replaced four non-ASCII characters in R source with `\uXXXX` escapes, which
   `R CMD check` reported as a WARNING and which halted `devtools::check()`.
   Three were inside string literals and so were the ones flagged: an en dash

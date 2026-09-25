@@ -327,7 +327,7 @@ CLIMATIC SUITABILITY (Heading 1)
    
    State-level Suitability Trends / Hot Spots (Heading 3)
    
-   This file covers the states intersecting the USGS GAP range for the focal species. For each state it gives: the portion of that state lying inside the modeled extent (column "extent_area_state" -- this is NOT the state's total area, and must never be described as such), the GAP range area within the state, that state's share of the species' total GAP range, the percentages of range area with positive and negative suitability trends, and the area and percentage of "hot spots," which we define as areas where declining trends in suitability are accelerating.
+   This file covers the states intersecting the USGS GAP range for the focal species. For each state it gives: the portion of that state lying inside the modeled extent (column "extent_area_state" -- this is NOT the state's total area, and must never be described as such), the GAP range area within the state, that state's share of the species' total GAP range, the percentages of the modeled range area -- that is, the part of the state's range carrying trend data, which is less than all of it where the range extends over water -- with positive and negative suitability trends, and the area and percentage of "hot spots," which we define as areas where declining trends in suitability are accelerating.
 
    Hot spot percentage is hot spot area divided by that state's range area.
 
