@@ -38,6 +38,7 @@
 #' @return Character. Invisibly returns the path to the written \code{.docx}.
 #'
 #' @importFrom officer read_docx fp_text fp_par fp_border fpar ftext body_add_fpar
+#' @importFrom officer body_set_default_section prop_section page_size page_mar
 #'
 #' @examples
 #' \dontrun{
@@ -65,14 +66,19 @@ assemble_coversheet <- function(alpha_code) {
     out_dir, sprintf("%s-Suitability-Trend-Analysis.docx", alpha_code)
   )
 
-  # Colors, fonts, and sizes lifted from the "Office" theme python-docx uses
-  # by default, which is what the AI-written narrative renders in.
+  # Colors, fonts, and sizes taken from the theme in python-docx's default
+  # template, which is what the AI-written narrative renders in. That theme
+  # sets majorFont (title and headings) to Calibri and minorFont (body) to
+  # Cambria -- not the other way round, which is how this was first written,
+  # so the coversheet came out serif-headed with sans body while the
+  # narrative was sans-headed with serif body. The two pages open the same
+  # report and are meant to be interchangeable front matter.
   title_fmt   <- officer::fp_text(color = "#17365D", font.size = 26,
-                                  font.family = "Cambria")
-  heading_fmt <- officer::fp_text(color = "#365F91", font.size = 14,
-                                  bold = TRUE, font.family = "Cambria")
-  body_fmt    <- officer::fp_text(color = "#000000", font.size = 11,
                                   font.family = "Calibri")
+  heading_fmt <- officer::fp_text(color = "#365F91", font.size = 14,
+                                  bold = TRUE, font.family = "Calibri")
+  body_fmt    <- officer::fp_text(color = "#000000", font.size = 11,
+                                  font.family = "Cambria")
 
   title_par <- officer::fp_par(text.align = "left", padding.bottom = 0)
   # The rule under the title is a bottom border on the last title line,
@@ -85,6 +91,8 @@ assemble_coversheet <- function(alpha_code) {
                                  padding.top = 18, padding.bottom = 6)
   body_par    <- officer::fp_par(text.align = "left",
                                  padding.bottom = 10, line_spacing = 1.15)
+  list_par    <- officer::fp_par(text.align = "left",
+                                 padding.bottom = 0, line_spacing = 1.15)
 
   # Same figure list and citation the narrative prompt requires verbatim, so
   # the two versions of this page read as interchangeable front matter.
@@ -128,9 +136,28 @@ assemble_coversheet <- function(alpha_code) {
   doc <- officer::body_add_fpar(doc, officer::fpar(
     officer::ftext("INCLUDED FIGURES", heading_fmt), fp_p = heading_par
   ))
+  # Set as a tight bulleted list rather than eight spaced body paragraphs.
+  # On the provider path this list shares the narrative's final page with the
+  # AI disclosure, the reproducibility block and the citation, and at body
+  # spacing the eight gaps alone cost about five lines, enough to push the
+  # closing timestamp onto a page of its own. The prompt asks for the same
+  # treatment so both pages match.
   for (fig in figures) {
     doc <- officer::body_add_fpar(doc, officer::fpar(
-      officer::ftext(fig, body_fmt), fp_p = body_par
+      officer::ftext(paste0("\u2022  ", fig), body_fmt), fp_p = list_par
+    ))
+  }
+
+  # Placed between the figure list and the citation, which is where the
+  # narrative prompt puts it too: the citation and the closing timestamp
+  # form a colophon, and substantive text does not belong between them.
+  repro <- .reproducibility_statement(.run_seed(species_dir))
+  doc <- officer::body_add_fpar(doc, officer::fpar(
+    officer::ftext(repro$heading, heading_fmt), fp_p = heading_par
+  ))
+  for (para in repro$body) {
+    doc <- officer::body_add_fpar(doc, officer::fpar(
+      officer::ftext(para, body_fmt), fp_p = body_par
     ))
   }
 
@@ -148,6 +175,23 @@ assemble_coversheet <- function(alpha_code) {
     officer::ftext(sprintf("(rENM Framework - %s)", timestamp), body_fmt),
     fp_p = officer::fp_par(text.align = "left")
   ))
+
+  # officer's default template is A4 with 1 inch margins; python-docx's is
+  # US Letter with 1.25 inch sides, which is what the narrative comes back
+  # as. assemble_final_report() normalizes page size with cpdf -scale-to-fit,
+  # so the mismatch never produced a ragged report -- it scaled the A4
+  # coversheet down by about six percent, which rendered its text a size
+  # smaller than the same text on the narrative's pages. Match the narrative
+  # instead, so nothing is scaled.
+  doc <- officer::body_set_default_section(
+    doc,
+    officer::prop_section(
+      page_size = officer::page_size(width = 8.5, height = 11,
+                                     orient = "portrait"),
+      page_margins = officer::page_mar(top = 1, bottom = 1,
+                                       left = 1.25, right = 1.25)
+    )
+  )
 
   print(doc, target = docx_path)
 

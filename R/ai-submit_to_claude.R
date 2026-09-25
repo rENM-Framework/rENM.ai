@@ -246,6 +246,14 @@ submit_to_claude <- function(
   # it from the argument keeps that claim true when the model is overridden.
   prompt <- gsub("<model>", model, prompt, fixed = TRUE)
 
+  # The REPRODUCIBILITY block is generated here, not by the model, and the
+  # same generator fills the coversheet, so the two paths emit identical
+  # text. render_ai_docx() checks that it survived the round trip.
+  repro <- .reproducibility_statement(.run_seed(species_dir))
+  prompt <- gsub("<reproducibility>",
+                 paste(repro$body, collapse = "\n\n"),
+                 prompt, fixed = TRUE)
+
   zip_kb <- round(file.info(zip_path)$size / 1024, 1)
   message(sprintf("    Zip size: %.1f KB  |  Prompt chars: %s",
                   zip_kb,

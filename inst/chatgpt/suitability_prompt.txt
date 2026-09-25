@@ -468,6 +468,18 @@ INCLUDED FIGURES (Heading 1)
    assembled report, so its own length determines where the later pages
    fall, and any number written here would be a guess.
 
+   Set each entry as a bulleted list item with NO space between items:
+
+      from docx.shared import Pt          # required for the two lines below
+      p = doc.add_paragraph(entry, style="List Bullet")
+      p.paragraph_format.space_after = Pt(0)
+      p.paragraph_format.space_before = Pt(0)
+
+   Do NOT add them as ordinary body paragraphs. This page also carries the
+   reproducibility block and the citation, and at body spacing the eight
+   gaps in this list alone cost about five lines, which is enough to push
+   the final line of the document onto a page of its own.
+
    Climatic Suitability Time Series
    Range Time Series
    Climatic Suitability Trends
@@ -476,6 +488,22 @@ INCLUDED FIGURES (Heading 1)
    Variable Contribution Trends
    Predictor Variable Trends
    rENM Framework MERRA Variables
+
+-----
+REPRODUCIBILITY (Heading 1)
+
+   Include the following text exactly, as two body paragraphs, reproducing
+   it character for character. Do NOT rewrite, condense, expand, reorder or
+   "improve" any part of it, and do NOT add to it.
+
+   This block states how the software behaves: how the seed is applied, what
+   determinism depends on, and which figures are stable between runs. You
+   have no way to check any of that against the files you were given. A
+   rewording here would not be a stylistic variation, it would be a false
+   statement about the pipeline. It is supplied to you already written for
+   that reason.
+
+<reproducibility>
 
 -----
 For additional information about the rENM Framework, see: (Heading 1)

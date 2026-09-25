@@ -113,6 +113,14 @@ submit_to_chatgpt <- function(
   # it from the argument keeps that claim true when the model is overridden.
   prompt <- gsub("<model>", model, prompt, fixed = TRUE)
 
+  # The REPRODUCIBILITY block is generated here, not by the model, and the
+  # same generator fills the coversheet, so the two paths emit identical
+  # text. render_ai_docx() checks that it survived the round trip.
+  repro <- .reproducibility_statement(.run_seed(species_dir))
+  prompt <- gsub("<reproducibility>",
+                 paste(repro$body, collapse = "\n\n"),
+                 prompt, fixed = TRUE)
+
   # ---- Upload bundle --------------------------------------------------------
   req_upload <- httr2::request("https://api.openai.com/v1/files") |>
     httr2::req_auth_bearer_token(api_key) |>

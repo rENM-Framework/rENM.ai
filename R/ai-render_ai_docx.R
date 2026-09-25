@@ -98,6 +98,25 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
     )
   }
 
+  # The REPRODUCIBILITY block is supplied to the model as text to copy, not
+  # to write. It describes how the software behaves, which the model cannot
+  # check, so a paraphrase is a false statement rather than a rewording.
+  # Stops, like the placeholder check and for the same reason: a report
+  # asserting the wrong thing about its own reproducibility is worse than a
+  # report without an opening page. The coversheet path builds the block
+  # directly and cannot fail this.
+  repro_faults <- .check_docx_reproducibility(docx_path, .run_seed(species_dir))
+  if (length(repro_faults)) {
+    stop(
+      "Narrative for ", code, " did not reproduce the REPRODUCIBILITY block",
+      " verbatim:\n",
+      paste0("  ", repro_faults, collapse = "\n"),
+      "\nThe .docx is on disk but no PDF was produced. Re-run",
+      " submit_to_chatgpt(\"", code, "\") to regenerate the narrative.",
+      call. = FALSE
+    )
+  }
+
   # Known prose faults, not a general quality judgement. Warns: the report
   # stays readable and every figure is right.
   prose <- .check_docx_prose(docx_path)
