@@ -1,4 +1,14 @@
 # rENM.ai 0.2.0.9000
+* Both prompts no longer call a positive change trend "acceleration" and a
+  negative one "deceleration". Hot spots are declines that are steepening,
+  which carry a negative change trend, so under the old labels a narrative
+  would place every hot spot in an area it had just described as
+  decelerating. Paragraph 2 now defines the sign directly, forbids the two
+  words, and is headed "Range-wide Suitability Change Trend". The hot-spot
+  definition sentence is unchanged; with the corrected mask in
+  `rENM.analysis::find_hot_spots()` it now describes what is mapped. Both
+  prompt headers are dated 2026.10.01.
+
 * Both prompts now describe the two median-slope columns in the boundary
   statistics file and forbid calling a zone between 45 and 55 percent
   positive "majority positive" or "majority negative", requiring instead

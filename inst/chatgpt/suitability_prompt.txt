@@ -1,4 +1,4 @@
-chatgpt suitability prompt - 2026.09.20
+chatgpt suitability prompt - 2026.10.01
 
 -----------------------------------------------------------------------
 SYSTEM MESSAGE AND GENERAL BEHAVIOR
@@ -227,19 +227,29 @@ CLIMATIC SUITABILITY (Heading 1)
 
    **Paragraph 2: Based on the Suitability-Change-Trend-Percentages.csv and Suitability-Change-Trend.tif files**
    
-   Range-wide Suitability Trend Acceleration / Deceleration (Heading 3)
+   Range-wide Suitability Change Trend (Heading 3)
 
-   This raster quantifies *rate of change in the suitability trends themselves* across 1980–2020.
+   This raster is the Theil-Sen trend in successive changes in suitability
+   across 1980–2020. Each change is a later suitability minus an earlier one.
    Consistently use this interpretation of the raster values:
-   - Positive rate-of-change = acceleration, Negative rate-of-change = deceleration.
-   - Explain "acceleration" and "deceleration" in the description and use those terms throughout.
+   - Positive: successive changes grew more positive. Gains strengthened or
+     losses eased.
+   - Negative: successive changes grew more negative. Gains faded or losses
+     steepened.
+   - The sign alone does not say whether suitability rose or fell. Where
+     you describe what a sign means on the ground, read it together with
+     the Paragraph 1 trend.
+   - Do NOT call positive values "acceleration" or negative values
+     "deceleration". Hot spots are declines that are steepening, which
+     carry a NEGATIVE change trend, and the two uses would contradict
+     each other.
    
    Suitability-Change-Trend-Percentages.csv carries the same columns as the
    file used in Paragraph 1, computed over the change-trend raster. TAKE THE
    QUANTITIES FROM THE CSV. Do NOT derive them from the raster.
 
-      positive_area_km2 / percent_positive   ACCELERATION
-      negative_area_km2 / percent_negative   DECELERATION
+      positive_area_km2 / percent_positive   changes growing more positive
+      negative_area_km2 / percent_negative   changes growing more negative
       valid_area_km2                         the percentage denominator
 
    Use the same denominator wording as Paragraph 1, so the two paragraphs
@@ -248,9 +258,9 @@ CLIMATIC SUITABILITY (Heading 1)
    Use the raster ONLY for where things are, never for how much.
 
    Include:
-   - Areas and percentages of acceleration and deceleration, from the CSV.
-   - Geographic distribution of the areas showing acceleration and deceleration.
-   - Important acceleration and deceleration gradients if they exist.
+   - Areas and percentages of positive and negative change trend, from the CSV.
+   - Geographic distribution of the positive and negative areas.
+   - Important gradients between them if they exist.
    - STRICTLY descriptive. No ecological interpretation.
    - Provide relative spatial descriptions using cardinal directions rather than lat/lon.
 
