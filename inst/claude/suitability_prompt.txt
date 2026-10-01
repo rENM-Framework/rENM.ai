@@ -342,10 +342,17 @@ CLIMATIC SUITABILITY (Heading 1)
    Hot spot percentage is hot spot area divided by that state's range area.
 
    Include:
-   - GAP area and percent of GAP range in each of the TOP 3 states based on the percent of total GAP range in each state. Do not mention any other states.
+   - Rank the states by the "range_pct" column, highest first. The file is
+     in alphabetical order, not ranked, so sort it yourself. "Top" below
+     always means this ranking, never hot spot area.
+   - GAP area and percent of GAP range for each of the TOP 3 states.
    - MANDATORY: You MUST include this sentence early in the description:
      "We define hot spots as areas where declining suitability trends are accelerating."
-   - Hot spot area and percentages for each of the TOP 4 states.
+   - Hot spot area and percentage ("hotspot_area", "hotspot_pct") for each
+     of the TOP 4 states: the three above and the fourth-ranked state. If
+     one of the four has no hot spot area, say so in a few words.
+   - Name no state outside these four. Do NOT substitute a state with more
+     hot spot area for one of the top 4.
    - STRICTLY descriptive. No ecological interpretation
 
    
@@ -602,8 +609,8 @@ CHECK:
 1. CLIMATIC SUITABILITY = 6 paragraphs
 2. ENVIRONMENTAL STRUCTURE = 2 paragraphs
 3. Word limits satisfied
-4. Only top 3 states included, in every sentence that names states,
-   and no state with zero hot-spot area is named at all
+4. No state named outside the top 4 by range_pct; range figures for the
+   top 3, hot spot figures for the top 4
 5. Hot spots definition is included
 6. No extra sections
 7. Extent described as the buffered GAP range, not as the GAP range itself

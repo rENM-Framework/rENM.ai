@@ -1,4 +1,26 @@
 # rENM.ai 0.2.0.9000
+* The state paragraph's instructions no longer contradict each other. One
+  rule asked for range figures for the top three states and said to mention
+  no other state, another asked for hot spot figures for the top four, and
+  the self-check repeated "only top 3" and forbade naming a state with no
+  hot spot area. ChatGPT resolved the conflict differently on each CASP run:
+  once by dropping the hot spot figures, once by reporting Nebraska, sixth
+  by range share, in place of Colorado. The prompts now say to rank by
+  `range_pct` (the file is alphabetical), give range figures for the top
+  three and hot spot figures for the top four, say so plainly if one of the
+  four has none, and name no other state.
+
+* The fixed-text check now treats typographic and straight quotes and
+  apostrophes as the same. A Claude narrative, complete and correct, was
+  rejected because it set the title in the framework citation in curly
+  quotes, and the coversheet replaced it. Every other character must still
+  match, so the trailing periods the check was written to catch still fail
+  it.
+* `render_ai_docx()` messages no longer tell the user to re-run
+  `submit_to_chatgpt()` on every failure, including Claude runs. The
+  function is not told which provider wrote the document, so they now name
+  both.
+
 * The REPRODUCIBILITY statement now covers hot spot location, the change
   trend and the variables, not only range-wide and per-state figures. It
   says total hot spot area reproduces closely across seeds but hot spot
