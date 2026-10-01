@@ -226,8 +226,12 @@
 #' returned every one of these twelve strings with a period added --
 #' "INCLUDED FIGURES.", "REPRODUCIBILITY.", and a citation heading reading
 #' "... see:." -- and the containment test passed all of them. Only
-#' whitespace is normalized, because Word and the DOCX writer both reflow
-#' runs within a paragraph.
+#' whitespace and quote style are normalized. Word and the DOCX writer both
+#' reflow runs within a paragraph, and a model may set straight quotes and
+#' apostrophes as typographic ones: Claude returned the citation with the
+#' title in curly quotes and an otherwise exact page, which this check then
+#' rejected for a change no reader would call an alteration. Every other
+#' character, punctuation included, must match.
 #'
 #' The reproducibility block is the part that most needs this. It states how
 #' the seed is applied, what determinism depends on and which figures are
@@ -255,7 +259,11 @@
   txt <- .docx_paragraph_text(docx_path)
   if (!length(txt)) return("document has no readable paragraphs")
 
-  norm  <- function(x) gsub("[[:space:]]+", " ", trimws(x))
+  norm  <- function(x) {
+    x <- gsub("[\u201c\u201d\u201e\u2033]", "\"", x)
+    x <- gsub("[\u2018\u2019\u201a\u2032]", "'", x)
+    gsub("[[:space:]]+", " ", trimws(x))
+  }
   debul <- function(x) trimws(sub("^\u2022[[:space:]]*", "", x))
   have  <- unique(debul(norm(txt)))
 

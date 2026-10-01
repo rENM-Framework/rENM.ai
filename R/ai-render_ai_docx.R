@@ -92,8 +92,7 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
       " unsubstituted placeholder(s). Where these stand in for a number the",
       " report is missing data:\n",
       paste0("  ", placeholders, collapse = "\n"),
-      "\nThe .docx is on disk but no PDF was produced. Re-run",
-      " submit_to_chatgpt(\"", code, "\") to regenerate the narrative.",
+      "\nThe .docx is on disk but no PDF was produced. ", .rerun_hint(code), ".",
       call. = FALSE
     )
   }
@@ -112,8 +111,7 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
       "Narrative for ", code, " did not reproduce ", length(fixed_faults),
       " supplied block(s) verbatim:\n",
       paste0("  ", fixed_faults, collapse = "\n"),
-      "\nThe .docx is on disk but no PDF was produced. Re-run",
-      " submit_to_chatgpt(\"", code, "\") to regenerate the narrative.",
+      "\nThe .docx is on disk but no PDF was produced. ", .rerun_hint(code), ".",
       call. = FALSE
     )
   }
@@ -126,7 +124,7 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
       "Narrative for ", code, " has ", length(prose),
       " prose fault(s):\n",
       paste0("  ", prose, collapse = "\n"),
-      "\nRe-run submit_to_chatgpt() if the wording matters.",
+      "\n", .rerun_hint(code), " if the wording matters.",
       call. = FALSE
     )
   }
@@ -138,7 +136,7 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
       " paragraph(s) ending without terminal punctuation, which usually",
       " means the text was truncated to hit a word limit:\n",
       paste0("  ", truncated, collapse = "\n"),
-      "\nThe PDF is still rendered. Re-run submit_to_chatgpt() to regenerate.",
+      "\nThe PDF is still rendered. ", .rerun_hint(code), ".",
       call. = FALSE
     )
   }
@@ -237,4 +235,25 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
   }
 
   invisible(pdf_path)
+}
+
+#' How to regenerate a narrative, named for both providers
+#'
+#' @details
+#' \code{render_ai_docx()} is not told which provider wrote the document, so
+#' its messages name both submit functions. They previously named
+#' \code{submit_to_chatgpt()} on every run, including runs whose narrative
+#' came from Claude.
+#'
+#' @param code Character. Upper-case alpha code.
+#'
+#' @return Character scalar.
+#'
+#' @keywords internal
+#' @noRd
+.rerun_hint <- function(code) {
+  sprintf(
+    "Re-run submit_to_chatgpt(\"%s\") or submit_to_claude(\"%s\"), whichever wrote it, to regenerate the narrative",
+    code, code
+  )
 }
