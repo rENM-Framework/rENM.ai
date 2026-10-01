@@ -438,9 +438,18 @@ ENVIRONMENTAL STRUCTURE (Heading 1)
    This file shows the Bayesian linear regression results for the Top 10 environmental variables used in the ensemble models across the 1980-2020 span of the study.
 
    Include:
-   - Short verbal interpretation of these metrics and a statement regarding variables showing showing statistically-significant directional trends. DO NOT provide specific values.
-   - Summary of the environmental structure and gradients represented by the most important contributing variables
-   - Summary of notable changes in the environmental structure across the time series
+   - Short verbal interpretation of these metrics and a statement regarding variables showing statistically-significant directional trends. DO NOT provide specific values.
+   - Summary of the environmental structure, described as the climate
+     gradients the leading variables represent (for example thermal,
+     moisture or radiation), not as a ranking of individual variables.
+   - One sentence stating that the candidate variables are strongly
+     correlated and many sets of them fit about equally well, so another
+     run can select different variables from the same gradients.
+   - Summary of notable changes in the environmental structure across the
+     time series. A trend in one variable's contribution can reflect weight
+     shifting among correlated variables rather than a change in that
+     factor's importance. Do NOT present it as evidence that the factor
+     itself became more or less important.
    - STRICTLY descriptive. No ecological interpretation.
 
    
@@ -456,6 +465,9 @@ ENVIRONMENTAL STRUCTURE (Heading 1)
 
    Constraints:
    - Name a mechanism only where the variable contributions support it.
+   - Attribute a mechanism to a gradient, not to a single variable, and do
+     NOT argue from a variable's absence. Another run could select a
+     correlated variable in its place.
    - Distinguish what the data shows from what it suggests.
    - Do NOT restate the interpretation from the CLIMATIC SUITABILITY
      section. Extend it.

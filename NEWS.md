@@ -1,4 +1,15 @@
 # rENM.ai 0.2.0.9000
+* The Environmental Structure section of both prompts now asks for the
+  variable profile to be described as climate gradients rather than a
+  ranking of variables, with one sentence saying another run could select
+  different variables from the same gradients. A trend in one variable's
+  contribution may not be presented as evidence that the factor itself
+  became more or less important, and the interpretation paragraph may not
+  attribute a mechanism to a single variable or argue from a variable's
+  absence. Runs at different seeds agree on gradients far more than on
+  variables, so a narrative built on individual variables describes the
+  seed as much as the species.
+
 * Both prompts no longer call a positive change trend "acceleration" and a
   negative one "deceleration". Hot spots are declines that are steepening,
   which carry a negative change trend, so under the old labels a narrative
