@@ -44,6 +44,18 @@
   # run: overrunning it by one line pushes the closing timestamp onto a page
   # of its own. Measured against a rendered report, not estimated. Lengthen
   # this text only after re-checking that the last page still closes.
+  # Last measured 2026-10-01 on the CASP, EAME and GRRO pilot pages through
+  # LibreOffice: the provider page closes 29 pt above the bottom margin,
+  # about two lines, with either provider's model name in the disclosure;
+  # the coversheet closes with more to spare.
+  #
+  # The stability claims in the second paragraph rest on five seeded CASP
+  # runs, land cells only: hot spot share of land 12.1 to 13.5 percent per
+  # run, but only 0.8 percent of land a hot spot in all five (mean pairwise
+  # Jaccard 0.21); mean between-run cell correlation 0.80 for the suitability
+  # trend and 0.46 for the change trend; same-interval variable sets
+  # overlapping at a mean Jaccard of 0.45. One species, so the wording stays
+  # qualitative.
   body <- c(
     paste0(
       "This report presents one realization of a stochastic pipeline, ",
@@ -54,10 +66,15 @@
       "distribution the pipeline would otherwise sample."
     ),
     paste0(
-      "Range-wide figures reproduce closely across seeds. Per-state figures ",
-      "for states holding few raster cells are less stable, and small ",
-      "differences among them should not be read as differences in the ",
-      "data. No uncertainty interval is reported."
+      "Range-wide figures, including total hot spot area, reproduce closely ",
+      "across seeds. Finer detail does not. Per-state figures for states ",
+      "holding few raster cells are less stable, and small differences among ",
+      "them should not be read as differences in the data. Hot spot ",
+      "locations vary substantially between seeds, and the change trend is ",
+      "less stable cell by cell than the suitability trend. Seeds can also ",
+      "select different but correlated variables, so those named here are ",
+      "one of several sets that fit about equally well. No uncertainty ",
+      "interval is reported."
     )
   )
 

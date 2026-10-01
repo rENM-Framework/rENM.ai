@@ -1,4 +1,21 @@
 # rENM.ai 0.2.0.9000
+* The REPRODUCIBILITY statement now covers hot spot location, the change
+  trend and the variables, not only range-wide and per-state figures. It
+  says total hot spot area reproduces closely across seeds but hot spot
+  locations do not, that the change trend is less stable cell by cell than
+  the suitability trend, and that the variables named are one of several
+  sets that fit about equally well. The basis is five seeded CASP runs over
+  land: hot spot share of land 12.1 to 13.5 percent per run, but only 0.8
+  percent of land a hot spot in all five (mean pairwise Jaccard 0.21);
+  between-run cell correlation 0.80 for the suitability trend and 0.46 for
+  the change trend; same-interval variable sets overlapping at a mean
+  Jaccard of 0.45. The wording stays qualitative because the evidence is
+  one species. Measured through LibreOffice on the CASP, EAME and GRRO pilot
+  pages, the provider page still closes about two lines above its bottom
+  margin, with either provider's model name, and the coversheet stays on
+  one page. A first draft one line longer left a single line to spare and
+  was cut.
+
 * The Environmental Structure section of both prompts now asks for the
   variable profile to be described as climate gradients rather than a
   ranking of variables, with one sentence saying another run could select
