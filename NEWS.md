@@ -21,22 +21,29 @@
   function is not told which provider wrote the document, so they now name
   both.
 
-* The REPRODUCIBILITY statement now covers hot spot location, the change
-  trend and the variables, not only range-wide and per-state figures. It
-  says total hot spot area reproduces closely across seeds but hot spot
-  locations do not, that the change trend is less stable cell by cell than
-  the suitability trend, and that the variables named are one of several
-  sets that fit about equally well. The basis is five seeded CASP runs over
-  land: hot spot share of land 12.1 to 13.5 percent per run, but only 0.8
-  percent of land a hot spot in all five (mean pairwise Jaccard 0.21);
-  between-run cell correlation 0.80 for the suitability trend and 0.46 for
-  the change trend; same-interval variable sets overlapping at a mean
-  Jaccard of 0.45. The wording stays qualitative because the evidence is
-  one species. Measured through LibreOffice on the CASP, EAME and GRRO pilot
-  pages, the provider page still closes about two lines above its bottom
+* The REPRODUCIBILITY statement's second paragraph now describes what
+  varies between seeds, not only range-wide and per-state figures. It says
+  results vary between seeds and finer detail varies more; that the
+  direction of the range-wide trend and of the centroid shift usually
+  reproduce, but percentages can move by 10 to 30 points and where trends
+  are weak the majority direction itself can change; that the change trend,
+  per-state figures and hot spot locations are less stable still; and that
+  the variables named are one of several sets that fit about equally well.
+  The basis is 35 seeded runs of six species (CASP x10; GRRO, EAME, PIJA,
+  GRWA, GRVI x5). The extent's positive share moved 10 to 31 points across
+  seeds, and its majority sign changed for PIJA (1 of 5 runs positive) and
+  EAME (4 of 5); the change trend's majority sign changed in five species;
+  centroid bearings held in every species; hot-spot maps from two seeds
+  overlapped by 0.16 to 0.38 (Jaccard). An earlier draft, based on CASP
+  alone, said range-wide figures reproduce closely, which the other species
+  contradicted. Measured through LibreOffice on the CASP, EAME and GRRO
+  pilot pages, the provider page closes about two lines above its bottom
   margin, with either provider's model name, and the coversheet stays on
-  one page. A first draft one line longer left a single line to spare and
-  was cut.
+  one page.
+* The Variable Profile paragraph of both prompts no longer asks for a
+  statement about variables with statistically significant contribution
+  trends, and forbids singling one out: across 35 seeded runs such trends
+  almost never recurred at another seed.
 
 * The Environmental Structure section of both prompts now asks for the
   variable profile to be described as climate gradients rather than a

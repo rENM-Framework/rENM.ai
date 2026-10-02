@@ -445,7 +445,10 @@ ENVIRONMENTAL STRUCTURE (Heading 1)
    This file shows the Bayesian linear regression results for the Top 10 environmental variables used in the ensemble models across the 1980-2020 span of the study.
 
    Include:
-   - Short verbal interpretation of these metrics and a statement regarding variables showing statistically-significant directional trends. DO NOT provide specific values.
+   - Short verbal interpretation of these metrics. DO NOT single out a
+     variable as having a significant or strong contribution trend: across
+     35 seeded test runs, such trends almost never recurred at another
+     seed. DO NOT provide specific values.
    - Summary of the environmental structure, described as the climate
      gradients the leading variables represent (for example thermal,
      moisture or radiation), not as a ranking of individual variables.

@@ -44,17 +44,19 @@
   # run: overrunning it by one line pushes the closing timestamp onto a page
   # of its own. Measured against a rendered report, not estimated. Lengthen
   # this text only after re-checking that the last page still closes.
-  # Last measured 2026-10-01 on the CASP, EAME and GRRO pilot pages through
+  # Last measured 2026-10-02 on the CASP, EAME and GRRO pilot pages through
   # LibreOffice: the provider page closes 29 pt above the bottom margin,
   # about two lines, with either provider's model name in the disclosure;
-  # the coversheet closes with more to spare.
+  # the coversheet closes 57 pt above it.
   #
-  # The stability claims in the second paragraph rest on five seeded CASP
-  # runs, land cells only: hot spot share of land 12.1 to 13.5 percent per
-  # run, but only 0.8 percent of land a hot spot in all five (mean pairwise
-  # Jaccard 0.21); mean between-run cell correlation 0.80 for the suitability
-  # trend and 0.46 for the change trend; same-interval variable sets
-  # overlapping at a mean Jaccard of 0.45. One species, so the wording stays
+  # The second paragraph rests on 35 seeded runs of six species (CASP x10;
+  # GRRO, EAME, PIJA, GRWA, GRVI x5), land cells only. The extent's positive
+  # share moved 10 to 31 points across seeds, and its majority sign changed
+  # for PIJA (1 of 5 runs positive) and EAME (4 of 5). The range-wide change
+  # trend's majority sign changed in five species. Centroid bearings held in
+  # every species (mean resultant length 0.97 to 0.99). Hot-spot maps from
+  # two seeds overlapped by 0.16 to 0.38 (Jaccard). Same-interval variable
+  # sets overlapped by 0.38 to 0.65. Six species, so the wording stays
   # qualitative.
   body <- c(
     paste0(
@@ -66,15 +68,14 @@
       "distribution the pipeline would otherwise sample."
     ),
     paste0(
-      "Range-wide figures, including total hot spot area, reproduce closely ",
-      "across seeds. Finer detail does not. Per-state figures for states ",
-      "holding few raster cells are less stable, and small differences among ",
-      "them should not be read as differences in the data. Hot spot ",
-      "locations vary substantially between seeds, and the change trend is ",
-      "less stable cell by cell than the suitability trend. Seeds can also ",
-      "select different but correlated variables, so those named here are ",
-      "one of several sets that fit about equally well. No uncertainty ",
-      "interval is reported."
+      "Results vary between seeds, and finer detail varies more. The ",
+      "direction of the range-wide trend and of the centroid shift usually ",
+      "reproduce, but percentages can move by 10 to 30 points, and where ",
+      "trends are weak the majority direction itself can change. The change ",
+      "trend, per-state figures and hot spot locations are less stable still. ",
+      "Seeds can also select different but correlated variables, so those ",
+      "named here are one of several sets that fit about equally well. No ",
+      "uncertainty interval is reported."
     )
   )
 
