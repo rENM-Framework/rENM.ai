@@ -37,8 +37,10 @@
 #'   \item Calls Messages API with \code{text} + \code{file} content
 #'         blocks and the code execution tool enabled
 #'         (beta: \code{code-execution-2025-08-25}).
-#'   \item Saves the raw API response to \code{debug_resp.rds}
-#'         immediately after the call, regardless of outcome.
+#'   \item Saves the raw API response to
+#'         \code{Summaries/claude/debug_resp.rds} immediately after the
+#'         call, and deletes it once the DOCX has been downloaded. It is
+#'         kept only when no DOCX was retrieved, which is when it is needed.
 #'   \item Scans response blocks for output file IDs and downloads
 #'         the DOCX via the Files API (\code{files-api-2025-04-14}).
 #'   \item Deletes the uploaded input zip from Anthropic storage.
@@ -50,7 +52,7 @@
 #'
 #' If no DOCX is produced, inspect the saved response:
 #' \preformatted{
-#' resp <- readRDS("<species_dir>/debug_resp.rds")
+#' resp <- readRDS("<species_dir>/Summaries/claude/debug_resp.rds")
 #' submit_to_claude_diag(resp)
 #' }
 #' \code{submit_to_claude_diag()} prints block types, stdout/stderr
@@ -79,7 +81,7 @@
 #' <project_dir>/runs/<alpha_code>/Summaries/claude/suitability_prompt.txt
 #' <project_dir>/runs/<alpha_code>/Summaries/pages/
 #'     <alpha_code>-Suitability-Trend-Analysis.docx
-#' <project_dir>/runs/<alpha_code>/debug_resp.rds  <- saved after every run
+#' <project_dir>/runs/<alpha_code>/Summaries/claude/debug_resp.rds  <- kept only if no DOCX
 #' <project_dir>/runs/<alpha_code>/_log.txt
 #' }
 #'
@@ -126,7 +128,9 @@
 #'   \item \code{total_tokens}  -- total token count.
 #'   \item \code{est_cost_usd}  -- estimated cost in USD.
 #'   \item \code{response}      -- full parsed response body (list).
-#'   \item \code{debug_rds}     -- path to the saved debug_resp.rds file.
+#'   \item \code{debug_rds}     -- path to the saved debug_resp.rds file,
+#'                                  or \code{NA} once it has been removed
+#'                                  after a successful download.
 #' }
 #'
 #' @importFrom curl form_file
@@ -186,7 +190,8 @@ submit_to_claude <- function(
   species_dir <- file.path(project_dir, "runs", alpha_code)
   claude_dir  <- file.path(species_dir, "Summaries", "claude")
   out_dir     <- file.path(species_dir, "Summaries", "pages")
-  debug_rds   <- file.path(species_dir, "debug_resp.rds")
+  # Kept with the rest of the provider's files, not at the top of the run.
+  debug_rds   <- file.path(claude_dir, "debug_resp.rds")
 
   dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -437,6 +442,10 @@ submit_to_claude <- function(
 
     message(sprintf("    Saved: %s (%.1f KB)",
                     basename(docx_path), length(raw_bytes) / 1024))
+
+    # The saved response exists to diagnose a missing DOCX. With the DOCX in
+    # hand it is no longer needed, and it is still returned in `response`.
+    if (file.exists(debug_rds) && unlink(debug_rds) == 0L) debug_rds <- NA_character_
   } else {
     message("    No DOCX output file found -- skipping download.")
     message(sprintf(
@@ -522,14 +531,15 @@ submit_to_claude <- function(
 #'
 #' @param resp List. The parsed API response, either from
 #'   \code{result$response} or
-#'   \code{readRDS("<species_dir>/debug_resp.rds")}.
+#'   \code{readRDS("<species_dir>/Summaries/claude/debug_resp.rds")}, which
+#'   is kept only when no DOCX was retrieved.
 #'
 #' @return \code{NULL} invisibly (called for side effects).
 #'
 #' @examples
 #' \dontrun{
 #'   submit_to_claude_diag(result$response)
-#'   submit_to_claude_diag(readRDS("runs/CASP/debug_resp.rds"))
+#'   submit_to_claude_diag(readRDS("runs/CASP/Summaries/claude/debug_resp.rds"))
 #' }
 #'
 #' @export

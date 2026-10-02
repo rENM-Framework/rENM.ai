@@ -1,4 +1,11 @@
 # rENM.ai 0.2.0.9000
+* `submit_to_claude()` saves its raw API response, `debug_resp.rds`, in
+  `Summaries/claude/` beside the prompt and package rather than at the top
+  of the run folder, and deletes it once the DOCX has been downloaded. It
+  exists for `submit_to_claude_diag()` when no DOCX comes back, and in that
+  case it is kept. The parsed response is still returned as `response`, and
+  `debug_rds` is `NA` when the file has been removed.
+
 * `submit_to_claude()` now defaults to `claude-opus-5-5`, the current Opus,
   which costs 20 percent less per token than `claude-opus-5`. Effort is set
   explicitly (new `effort` argument, default `"medium"`), because the API

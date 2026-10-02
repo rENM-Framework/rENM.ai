@@ -9,7 +9,8 @@ submit_to_claude_diag(resp)
 \arguments{
 \item{resp}{List. The parsed API response, either from
 \code{result$response} or
-\code{readRDS("<species_dir>/debug_resp.rds")}.}
+\code{readRDS("<species_dir>/Summaries/claude/debug_resp.rds")}, which
+is kept only when no DOCX was retrieved.}
 }
 \value{
 \code{NULL} invisibly (called for side effects).
@@ -23,7 +24,7 @@ and any text Claude returned.
 \examples{
 \dontrun{
   submit_to_claude_diag(result$response)
-  submit_to_claude_diag(readRDS("runs/CASP/debug_resp.rds"))
+  submit_to_claude_diag(readRDS("runs/CASP/Summaries/claude/debug_resp.rds"))
 }
 
 }

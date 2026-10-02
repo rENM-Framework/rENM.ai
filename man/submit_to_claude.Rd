@@ -57,7 +57,9 @@ or \code{NA} if not found.
 \item \code{total_tokens}  -- total token count.
 \item \code{est_cost_usd}  -- estimated cost in USD.
 \item \code{response}      -- full parsed response body (list).
-\item \code{debug_rds}     -- path to the saved debug_resp.rds file.
+\item \code{debug_rds}     -- path to the saved debug_resp.rds file,
+or \code{NA} once it has been removed
+after a successful download.
 }
 }
 \description{
@@ -98,8 +100,10 @@ and avoids this problem.
 \item Calls Messages API with \code{text} + \code{file} content
 blocks and the code execution tool enabled
 (beta: \code{code-execution-2025-08-25}).
-\item Saves the raw API response to \code{debug_resp.rds}
-immediately after the call, regardless of outcome.
+\item Saves the raw API response to
+\code{Summaries/claude/debug_resp.rds} immediately after the
+call, and deletes it once the DOCX has been downloaded. It is
+kept only when no DOCX was retrieved, which is when it is needed.
 \item Scans response blocks for output file IDs and downloads
 the DOCX via the Files API (\code{files-api-2025-04-14}).
 \item Deletes the uploaded input zip from Anthropic storage.
@@ -111,7 +115,7 @@ the DOCX via the Files API (\code{files-api-2025-04-14}).
 
 If no DOCX is produced, inspect the saved response:
 \preformatted{
-resp <- readRDS("<species_dir>/debug_resp.rds")
+resp <- readRDS("<species_dir>/Summaries/claude/debug_resp.rds")
 submit_to_claude_diag(resp)
 }
 \code{submit_to_claude_diag()} prints block types, stdout/stderr
@@ -140,7 +144,7 @@ Both are enabled automatically via the \code{anthropic-beta} header:
 <project_dir>/runs/<alpha_code>/Summaries/claude/suitability_prompt.txt
 <project_dir>/runs/<alpha_code>/Summaries/pages/
     <alpha_code>-Suitability-Trend-Analysis.docx
-<project_dir>/runs/<alpha_code>/debug_resp.rds  <- saved after every run
+<project_dir>/runs/<alpha_code>/Summaries/claude/debug_resp.rds  <- kept only if no DOCX
 <project_dir>/runs/<alpha_code>/_log.txt
 }
 
