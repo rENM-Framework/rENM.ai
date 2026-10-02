@@ -6,7 +6,8 @@
 \usage{
 submit_to_claude(
   alpha_code,
-  model = "claude-opus-5",
+  model = "claude-opus-5-5",
+  effort = "medium",
   api_key = Sys.getenv("ANTHROPIC_API_KEY"),
   max_tokens = 32000L,
   timeout_sec = 600L,
@@ -18,9 +19,15 @@ submit_to_claude(
 \code{"CASP"}).}
 
 \item{model}{Character. Anthropic model identifier. Defaults to
-\code{"claude-opus-5"}. Note that \code{"claude-sonnet-4-6"} is both
-previous-generation and dearer than \code{"claude-sonnet-5"}; prefer the
-latter if a cheaper model is wanted.}
+\code{"claude-opus-5-5"}, the current Opus, which costs 20 percent less
+per token than \code{"claude-opus-5"} (the default before 2 October
+2026). Thinking cannot be disabled on it and is not requested here;
+\code{effort} controls how much it thinks.}
+
+\item{effort}{Character. \code{output_config.effort}: one of
+\code{"low"}, \code{"medium"}, \code{"high"}, \code{"xhigh"},
+\code{"max"}. Default \code{"medium"}, set explicitly because the API
+default differs between models (medium on Opus 5.5, high on Opus 5).}
 
 \item{api_key}{Character. Anthropic API key. Defaults to the value of
 the \code{ANTHROPIC_API_KEY} environment variable.}
@@ -139,13 +146,11 @@ Both are enabled automatically via the \code{anthropic-beta} header:
 
 \strong{Cost estimation}
 
-Approximate costs using claude-opus-5 pricing as of September 2026:
-\itemize{
-\item Input tokens:  $5.00 / 1M tokens
-\item Output tokens: $25.00 / 1M tokens
-}
-These are estimates only; actual billing may differ, and they are wrong
-for any other value of \code{model}.
+Approximate costs from per-model list prices as of October 2026
+(input / output per 1M tokens): \code{claude-opus-5-5} $4.00 / $20.00,
+\code{claude-opus-5} $5.00 / $25.00. Any other model logs no cost
+estimate rather than one computed at the wrong rates. These are
+estimates only; actual billing may differ.
 }
 \examples{
 \dontrun{

@@ -195,11 +195,42 @@
     list(
       what = "signed difference; use an unsigned magnitude and a direction",
       pat  = "difference of\\s*[\u2212-][0-9]"
+    ),
+    list(
+      what = "two agreeing majority statements; say \"both zones\"",
+      pat  = "majority (positive|negative)[^.]{0,60}?\\band\\b[^.]{0,60}?majority \\1"
     )
   )
 
   out <- character(0)
+  # A paragraph or heading printed twice in a row: a narrative once wrote
+  # "Range Boundary Dynamics" twice before its paragraph.
+  if (length(txt) > 1L) {
+    rep_i <- which(txt[-1L] == txt[-length(txt)] & nzchar(trimws(txt[-1L])))
+    for (i in rep_i) {
+      out <- c(out, sprintf("repeated paragraph or heading: \"%s\"",
+                            substr(txt[i + 1L], 1L, 60L)))
+    }
+    # The same fault inside one paragraph: the heading repeated as the first
+    # line of the paragraph beneath it, after a line break.
+    prev <- txt[-length(txt)]; nxt <- txt[-1L]
+    head_i <- which(nzchar(trimws(prev)) & nchar(prev) <= 80L & nxt != prev &
+                      startsWith(nxt, prev))
+    for (i in head_i) {
+      out <- c(out, sprintf("heading repeated at the start of its paragraph: \"%s\"",
+                            prev[i]))
+    }
+  }
   for (t in txt) {
+    # The same decimal figure twice in one paragraph is almost always a
+    # restated sentence: a narrative gave 71.97% and 63.22% twice, two
+    # sentences apart.
+    figs <- regmatches(t, gregexpr("[0-9][0-9,]*\\.[0-9]+", t))[[1L]]
+    dup  <- unique(figs[duplicated(figs)])
+    if (length(dup)) {
+      out <- c(out, sprintf("figure repeated within a paragraph (%s): %s...",
+                            paste(dup, collapse = ", "), substr(t, 1L, 60L)))
+    }
     for (r in rules) {
       m <- regexpr(r$pat, t, perl = TRUE, ignore.case = TRUE)
       if (m[1] > 0) {

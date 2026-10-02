@@ -85,20 +85,23 @@
 #'
 #' \strong{Cost estimation}
 #'
-#' Approximate costs using claude-opus-5 pricing as of September 2026:
-#' \itemize{
-#'   \item Input tokens:  $5.00 / 1M tokens
-#'   \item Output tokens: $25.00 / 1M tokens
-#' }
-#' These are estimates only; actual billing may differ, and they are wrong
-#' for any other value of \code{model}.
+#' Approximate costs from per-model list prices as of October 2026
+#' (input / output per 1M tokens): \code{claude-opus-5-5} $4.00 / $20.00,
+#' \code{claude-opus-5} $5.00 / $25.00. Any other model logs no cost
+#' estimate rather than one computed at the wrong rates. These are
+#' estimates only; actual billing may differ.
 #'
 #' @param alpha_code Character. Four-letter species alpha code (e.g.,
 #'   \code{"CASP"}).
 #' @param model Character. Anthropic model identifier. Defaults to
-#'   \code{"claude-opus-5"}. Note that \code{"claude-sonnet-4-6"} is both
-#'   previous-generation and dearer than \code{"claude-sonnet-5"}; prefer the
-#'   latter if a cheaper model is wanted.
+#'   \code{"claude-opus-5-5"}, the current Opus, which costs 20 percent less
+#'   per token than \code{"claude-opus-5"} (the default before 2 October
+#'   2026). Thinking cannot be disabled on it and is not requested here;
+#'   \code{effort} controls how much it thinks.
+#' @param effort Character. \code{output_config.effort}: one of
+#'   \code{"low"}, \code{"medium"}, \code{"high"}, \code{"xhigh"},
+#'   \code{"max"}. Default \code{"medium"}, set explicitly because the API
+#'   default differs between models (medium on Opus 5.5, high on Opus 5).
 #' @param api_key Character. Anthropic API key. Defaults to the value of
 #'   the \code{ANTHROPIC_API_KEY} environment variable.
 #' @param max_tokens Integer. Maximum output tokens. Defaults to 32000.
@@ -149,7 +152,8 @@
 #' @export
 submit_to_claude <- function(
     alpha_code,
-    model              = "claude-opus-5",
+    model              = "claude-opus-5-5",
+    effort             = "medium",
     api_key            = Sys.getenv("ANTHROPIC_API_KEY"),
     max_tokens         = 32000L,
     timeout_sec        = 600L,
@@ -201,6 +205,7 @@ submit_to_claude <- function(
   # The Files API left beta; only the code execution beta is still live.
   # A retired beta name in this header is at best ignored and at worst a 400.
   BETA_HEADER    <- "code-execution-2025-08-25"
+  FALLBACK_BETA  <- "server-side-fallback-2026-07-01"
   VERSION_HEADER <- "2023-06-01"
 
   .claude_req <- function(url) {
@@ -283,9 +288,14 @@ submit_to_claude <- function(
                   model, timeout_sec))
 
   body <- list(
-    model      = model,
-    max_tokens = max_tokens,
-    messages   = list(
+    model         = model,
+    max_tokens    = max_tokens,
+    output_config = list(effort = effort),
+    # A safety classifier can decline a request, and a false positive would
+    # otherwise cost the narrative. "default" re-runs a declined request on
+    # the model Anthropic recommends for the refusal category, server side.
+    fallbacks     = "default",
+    messages      = list(
       list(
         role    = "user",
         content = list(
@@ -316,7 +326,10 @@ submit_to_claude <- function(
   # Waits 60s before retry 1, 120s before retry 2, etc. -- covers the
   # per-minute token rate limit window on all API tiers.
   start_time    <- Sys.time()
+  # The fallback beta goes on this call only; the Files API calls share the
+  # request builder and have no use for it.
   messages_resp <- .claude_req("https://api.anthropic.com/v1/messages") |>
+    httr2::req_headers("anthropic-beta" = paste(BETA_HEADER, FALLBACK_BETA, sep = ",")) |>
     httr2::req_body_json(body) |>
     httr2::req_retry(
       max_tries    = 5,
@@ -338,6 +351,15 @@ submit_to_claude <- function(
   # whether a DOCX is found.
   saveRDS(resp_json, debug_rds)
   message(sprintf("    Response saved to: %s", debug_rds))
+
+  # A classifier decline arrives as HTTP 200 with stop_reason "refusal". Say
+  # so plainly rather than letting it surface as "no DOCX found".
+  if (identical(resp_json$stop_reason, "refusal")) {
+    cat_ <- resp_json$stop_details$category %||% "unspecified"
+    stop(sprintf(paste0("The model declined the request (refusal, category: %s), ",
+                        "and no fallback model accepted it. Response saved to %s."),
+                 cat_, debug_rds), call. = FALSE)
+  }
 
   # ---- 4. Extract output file ID and download DOCX ---------------------------
   message("[4/4] Scanning response for DOCX output file ...")
@@ -445,13 +467,15 @@ submit_to_claude <- function(
   total_tokens  <- if (!is.na(input_tokens) && !is.na(output_tokens))
     input_tokens + output_tokens else NA_integer_
 
-  # claude-opus-5 pricing as of September 2026:
-  #   Input: $5.00 / 1M tokens | Output: $25.00 / 1M tokens
-  # These are the default model's rates. A run with `model` set to anything
-  # else logs a cost computed on the wrong ones.
-  est_cost_usd <- sum(
-    (input_tokens  %||% 0) *  5.00 / 1e6,
-    (output_tokens %||% 0) * 25.00 / 1e6,
+  # List prices per 1M tokens, October 2026. A model not listed logs NA
+  # rather than a cost computed at another model's rates. A request that
+  # fell back to another model is still priced at the requested model's rate.
+  prices <- list("claude-opus-5-5" = c(4.00, 20.00),
+                 "claude-opus-5"   = c(5.00, 25.00))
+  rate <- prices[[model]]
+  est_cost_usd <- if (is.null(rate)) NA_real_ else sum(
+    (input_tokens  %||% 0) * rate[[1L]] / 1e6,
+    (output_tokens %||% 0) * rate[[2L]] / 1e6,
     na.rm = TRUE
   )
 

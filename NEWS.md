@@ -1,4 +1,31 @@
 # rENM.ai 0.2.0.9000
+* `submit_to_claude()` now defaults to `claude-opus-5-5`, the current Opus,
+  which costs 20 percent less per token than `claude-opus-5`. Effort is set
+  explicitly (new `effort` argument, default `"medium"`), because the API
+  default differs between the two models. The request opts into server-side
+  refusal fallback (`fallbacks = "default"`), so a safety-classifier false
+  positive re-runs on another model rather than costing the narrative, and a
+  refusal that no fallback accepts now stops with a message naming its
+  category instead of surfacing as "no DOCX found". The logged cost uses
+  per-model list prices; a model without one logs NA rather than a cost at
+  another model's rates. On CASP the Opus 5 path read 360,000 to 420,000
+  input tokens, about $2.50 a narrative.
+* Both prompts now forbid repeating a figure or a finding within a
+  paragraph and printing a heading twice, and say the boundary paragraph's
+  "Both zones are majority positive" sentence replaces the zone-by-zone
+  description rather than following it. ChatGPT had repeated a pair of
+  percentages two sentences apart and printed two headings twice.
+* Both prompts forbid presenting the range-wide balance of the change trend
+  as a finding, in the change-trend paragraph and in the interpretation:
+  across seeds it reversed for five of six species.
+* The prose check (`render_ai_docx()`, which warns) now also flags a
+  paragraph or heading repeated back to back, a heading repeated as the
+  first line of its own paragraph, the same decimal figure twice in one
+  paragraph, and two agreeing majority statements joined by "and". On the
+  four CASP test narratives it flagged both ChatGPT narratives, each for the
+  faults a reader had found, and nothing in either Claude narrative or in
+  the shipped pilot narratives.
+
 * The state paragraph's instructions no longer contradict each other. One
   rule asked for range figures for the top three states and said to mention
   no other state, another asked for hot spot figures for the top four, and

@@ -1,4 +1,4 @@
-claude suitability prompt - 2026.10.01
+claude suitability prompt - 2026.10.02
 
 -----------------------------------------------------------------------
 SYSTEM MESSAGE AND GENERAL BEHAVIOR
@@ -132,6 +132,10 @@ In particular:
 - Do NOT leave the seams of a template showing: no repeated sentence frames
   within a paragraph, no clause that exists only to hold a value, no
   enumeration where prose is called for.
+- State each figure ONCE in a paragraph. Do NOT restate a sentence or a
+  finding in different words later in the same paragraph. Write each
+  heading exactly once. Narratives have repeated a pair of percentages two
+  sentences apart and printed a heading twice in a row.
 - Vary sentence structure. A paragraph in which every sentence opens the
   same way reads as generated.
 
@@ -287,6 +291,10 @@ CLIMATIC SUITABILITY (Heading 1)
    - Areas and percentages of positive and negative change trend, from the CSV.
    - Geographic distribution of the positive and negative areas.
    - Important gradients between them if they exist.
+   - Report both shares, but do NOT describe either sign as prevailing,
+     dominant or the overall direction of change. Across runs at different
+     seeds the range-wide balance of the change trend reverses for most
+     species, so it is not a finding.
    - STRICTLY descriptive. No ecological interpretation.
    - Provide relative spatial descriptions using cardinal directions rather than lat/lon.
 
@@ -401,6 +409,8 @@ CLIMATIC SUITABILITY (Heading 1)
        * Both below 45%: "Both zones are majority negative."
        * Differing: "The interior is majority positive while the ring is
          majority negative", or the reverse as the data requires.
+     Use that sentence INSTEAD of describing each zone's majority
+     separately, never in addition to it.
      Do NOT use a contrastive conjunction such as "while" or "whereas" to
      join two statements that agree. Do NOT write constructions such as
      "majority positive and positive, respectively".
@@ -451,6 +461,9 @@ CLIMATIC SUITABILITY (Heading 1)
    - The size of the interior-to-ring difference has no established
      reference across species. Report it and say which way it runs. Do NOT
      characterize it as large, small, striking, or pronounced.
+   - Do NOT build an interpretation on which sign of the change trend covers
+     more of the extent. Of everything the pipeline maps, the change trend
+     varies most between seeds.
    - Base claims on the data in this package and on published literature you
      are confident is real. Do not fabricate references, values, or
      mechanisms.
