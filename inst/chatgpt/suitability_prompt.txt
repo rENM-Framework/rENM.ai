@@ -1,4 +1,4 @@
-chatgpt suitability prompt - 2026.10.02
+chatgpt suitability prompt - 2026.10.03
 
 -----------------------------------------------------------------------
 SYSTEM MESSAGE AND GENERAL BEHAVIOR
@@ -424,7 +424,14 @@ CLIMATIC SUITABILITY (Heading 1)
      Do NOT assume a direction, and do not turn a difference in degree into
      a difference in kind.
    - Where hot spots concentrate, say what that implies about where decline
-     is not merely present but gathering pace.
+     is not merely present but gathering pace. Take this ONLY from the hot
+     spot figures in the state CSV. Name the state with the largest hot spot
+     area. If a different state has the largest hot spot percentage, name
+     both and say which measure each leads on.
+   - Do NOT say that decline is easing, slowing or steepening anywhere on
+     the strength of the trend and change-trend maps read together. Hot
+     spots are the only places this report identifies as steepening decline.
+     Outside them, say nothing about the pace of decline.
 
    Constraints:
    - The ring is a fixed 250 km collar, not a map of habitat. Much of it may
@@ -626,7 +633,10 @@ CHECK:
 17. Every paragraph reads as literate English: no contrastive conjunction
     joining agreeing statements, no stray "respectively", no visible template
     seams, no repeated sentence frames. Read each one back before saving.
-18. No unsubstituted placeholder appears anywhere in the document. Search the
+18. Any statement about where decline is gathering pace rests on the hot
+    spot figures alone and names the state with the largest hot spot area.
+    No passage says decline is easing or slowing anywhere.
+19. No unsubstituted placeholder appears anywhere in the document. Search the
     assembled text for "{" before saving. A Python string built with a brace
     placeholder but without the f prefix writes the placeholder literally,
     and where it stands in for a number the report is missing data. Build
