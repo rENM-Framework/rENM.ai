@@ -105,7 +105,12 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
   # wrong thing about its own reproducibility, or reading "see:.", is worse
   # than a report without an opening page. The coversheet path builds these
   # from the same helpers and cannot fail this.
-  fixed_faults <- .check_docx_fixed_text(docx_path, .run_seed(species_dir))
+  # The centroid support statement is checked the same way, as a sentence
+  # inside the paragraph the model writes around it.
+  fixed_faults <- .check_docx_fixed_text(
+    docx_path, .run_seed(species_dir),
+    supplied = .centroid_support_statement(species_dir, code)
+  )
   if (length(fixed_faults)) {
     stop(
       "Narrative for ", code, " did not reproduce ", length(fixed_faults),
@@ -117,8 +122,10 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
   }
 
   # Known prose faults, not a general quality judgement. Warns: the report
-  # stays readable and every figure is right.
-  prose <- .check_docx_prose(docx_path)
+  # stays readable and every figure is right. A map paragraph that fails to
+  # name the region its data single out is reported with them.
+  prose <- c(.check_docx_prose(docx_path),
+             .check_docx_regions(docx_path, .region_extremes(species_dir, code)))
   if (length(prose)) {
     warning(
       "Narrative for ", code, " has ", length(prose),

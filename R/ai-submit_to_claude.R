@@ -264,6 +264,18 @@ submit_to_claude <- function(
                  paste(repro$body, collapse = "\n\n"),
                  prompt, fixed = TRUE)
 
+  # Which axes of the centroid shift the regressions support is decided
+  # here from the two summaries, not by the model, and render_ai_docx()
+  # checks that the sentence came back verbatim.
+  centroid_support <- .centroid_support_statement(species_dir, alpha_code)
+  if (is.na(centroid_support)) {
+    stop("Centroid regression summaries not found under ",
+         file.path(species_dir, "Trends", "centroids"),
+         "; run rENM.analysis::analyze_weighted_centroids() first.",
+         call. = FALSE)
+  }
+  prompt <- gsub("<centroid_support>", centroid_support, prompt, fixed = TRUE)
+
   zip_kb <- round(file.info(zip_path)$size / 1024, 1)
   message(sprintf("    Zip size: %.1f KB  |  Prompt chars: %s",
                   zip_kb,

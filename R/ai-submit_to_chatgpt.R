@@ -121,6 +121,18 @@ submit_to_chatgpt <- function(
                  paste(repro$body, collapse = "\n\n"),
                  prompt, fixed = TRUE)
 
+  # Which axes of the centroid shift the regressions support is decided
+  # here from the two summaries, not by the model, and render_ai_docx()
+  # checks that the sentence came back verbatim.
+  centroid_support <- .centroid_support_statement(species_dir, alpha_code)
+  if (is.na(centroid_support)) {
+    stop("Centroid regression summaries not found under ",
+         file.path(species_dir, "Trends", "centroids"),
+         "; run rENM.analysis::analyze_weighted_centroids() first.",
+         call. = FALSE)
+  }
+  prompt <- gsub("<centroid_support>", centroid_support, prompt, fixed = TRUE)
+
   # ---- Upload bundle --------------------------------------------------------
   req_upload <- httr2::request("https://api.openai.com/v1/files") |>
     httr2::req_auth_bearer_token(api_key) |>

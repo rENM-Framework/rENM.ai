@@ -278,15 +278,24 @@
 #' has a paragraph starting with it.
 #'
 #' @param docx_path Character. Path to the \code{.docx} to inspect.
+#' Some supplied text is a sentence inside a paragraph the model writes,
+#' not a paragraph of its own: the centroid support statement closes the
+#' centroid paragraph. Those are passed in \code{supplied} and must appear
+#' word for word within some paragraph, after the same normalization. They
+#' are required only on the provider path.
+#'
 #' @param seed Integer or \code{NA}. Passed through so the expected text is
 #'   the text that was actually sent.
+#' @param supplied Character. Sentences that must appear verbatim inside a
+#'   paragraph. \code{NA} entries are ignored.
 #'
 #' @return Character vector describing each altered or absent block, empty
 #'   if all are intact.
 #'
 #' @keywords internal
 #' @noRd
-.check_docx_fixed_text <- function(docx_path, seed = NA_integer_) {
+.check_docx_fixed_text <- function(docx_path, seed = NA_integer_,
+                                   supplied = character(0)) {
   txt <- .docx_paragraph_text(docx_path)
   if (!length(txt)) return("document has no readable paragraphs")
 
@@ -307,7 +316,8 @@
     .report_headings()[[2L]],
     .framework_citation()
   )
-  if (any(startsWith(have, "AI-ASSISTED INTERPRETATION"))) {
+  provider <- any(startsWith(have, "AI-ASSISTED INTERPRETATION"))
+  if (provider) {
     want <- c("AI-ASSISTED INTERPRETATION", want)
   }
 
@@ -322,6 +332,70 @@
     } else {
       sprintf("absent: \"%s\"", substr(w, 1L, 70L))
     })
+  }
+
+  supplied <- supplied[!is.na(supplied)]
+  if (provider) {
+    for (w in norm(supplied)) {
+      if (any(grepl(w, have, fixed = TRUE))) next
+      out <- c(out, sprintf("absent from its paragraph: \"%s\"", w))
+    }
+  }
+  out
+}
+
+#' Check that the map paragraphs name the regions the data single out
+#'
+#' @details
+#' The narrative describes where positive and negative values lie from the
+#' Regions CSVs, and the prompt requires it to name, for each layer, the
+#' region with the lowest positive share and the region with the highest.
+#' Omitting the most negative region was how one provider misdescribed the
+#' suitability trend: it placed the declines in the west and missed the
+#' southeast, the most negative ninth of the extent. This confirms both
+#' names appear in the paragraph that follows each map heading, as a region
+#' name or its adjective form. It cannot tell whether the surrounding
+#' sentence describes the region correctly; that is left to the prompt and
+#' a reader.
+#'
+#' @param docx_path Character. Path to the \code{.docx} to inspect.
+#' @param extremes List from \code{.region_extremes()}.
+#'
+#' @return Character vector of faults, empty when every name is present.
+#'
+#' @keywords internal
+#' @noRd
+.check_docx_regions <- function(docx_path, extremes) {
+  if (!length(extremes)) return(character(0))
+  txt <- trimws(gsub("[[:space:]]+", " ", .docx_paragraph_text(docx_path)))
+  headings <- c("Suitability-Trend"        = "Range-wide Suitability Trends",
+                "Suitability-Change-Trend" = "Range-wide Suitability Change Trend")
+  pattern <- function(r) switch(r,
+    northwest = "north-?west", northeast = "north-?east",
+    southwest = "south-?west", southeast = "south-?east",
+    north = "\\bnorth(ern)?\\b", south = "\\bsouth(ern)?\\b",
+    east  = "\\beast(ern)?\\b",  west  = "\\bwest(ern)?\\b",
+    central = "\\bcent(re|er|ral)\\b",
+    r)
+  out <- character(0)
+  for (layer in names(extremes)) {
+    i <- match(headings[[layer]], txt)
+    if (is.na(i) || i >= length(txt)) {
+      out <- c(out, sprintf("no paragraph under \"%s\"", headings[[layer]]))
+      next
+    }
+    para <- txt[[i + 1L]]
+    for (which in c("low", "high")) {
+      r   <- extremes[[layer]][[which]]
+      hit <- vapply(r, function(x) grepl(pattern(x), para, ignore.case = TRUE,
+                                         perl = TRUE), logical(1))
+      if (!any(hit)) {
+        out <- c(out, sprintf(
+          "\"%s\" does not name the %s, the region with the %s positive share",
+          headings[[layer]], paste(r, collapse = " or "),
+          if (which == "low") "lowest" else "highest"))
+      }
+    }
   }
   out
 }

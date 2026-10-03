@@ -52,8 +52,8 @@ Every area and percentage in this report is supplied by a CSV. Read each one
 from the CSV named in that paragraph's description. Do NOT compute any area
 or percentage from a raster, for any reason.
 
-Rasters are for describing WHERE a pattern lies. They are never for
-measuring HOW MUCH.
+The package contains no rasters. Where a pattern lies comes from the two
+Regions CSVs described in Paragraphs 1 and 2.
 
 NEVER report an area as 0.00 km² alongside a non-zero percentage. That
 combination is arithmetically impossible and means the area was not read
@@ -65,9 +65,8 @@ near-zero band and no tolerance:
 - positive: value > 0
 - negative: value < 0
 - zero:     value exactly 0
-Apply this same convention when you read a raster to describe where positive
-and negative areas lie, so the pattern you describe matches the figures you
-report. Do NOT introduce a threshold of your own.
+The Regions CSVs apply the same convention. Do NOT introduce a threshold
+of your own.
 
 MANDATORY: DO NOT state the classification rule in your descriptions.
 
@@ -177,11 +176,11 @@ CLIMATIC SUITABILITY (Heading 1)
 -----------------------------------------------------------------------
    This section contains EXACTLY 6 paragraphs:
 
-   **Paragraph 1: Based on the Suitability-Trend-Percentages.csv and Suitability-Trend.tif files**
+   **Paragraph 1: Based on the Suitability-Trend-Percentages.csv and Suitability-Trend-Regions.csv files**
    
    Range-wide Suitability Trends (Heading 3)
 
-   This raster represents the long-term (1980–2020) Theil-Sen trend in suitability probability over 5-year intervals.
+   The suitability trend is the long-term (1980–2020) Theil-Sen trend in suitability probability over 5-year intervals.
 
    The modeled extent is the rectangular bounding box of the species' USGS
    GAP range polygon after that polygon has been buffered outward by a fixed
@@ -216,26 +215,43 @@ CLIMATIC SUITABILITY (Heading 1)
      extent and a percentage cannot check the arithmetic, because the
      denominator is a number you did not print.
 
-   Use the raster ONLY for where things are, never for how much.
+   WHERE. Suitability-Trend-Regions.csv divides the extent into nine
+   regions, thirds of its east-west and north-south span: northwest,
+   north, northeast, west, central, east, southwest, south, southeast. For
+   each it gives the area carrying data, the share of that area with a
+   positive trend
+   (percent_positive) and the median trend (median_value).
+   Describe where positive and negative values lie ONLY from this table.
+   - Above 50 percent positive: mostly positive. Below 50: mostly
+     negative. Within a few points of 50: mixed.
+   - You MUST name the region with the lowest percent_positive and the
+     region with the highest, using these region names or their adjective
+     forms (southeastern, central).
+   - The strongest positive and negative values are where median_value is
+     largest and smallest. A gradient is a large step in median_value
+     between adjacent regions.
+   - Do NOT quote the regional figures. They locate the pattern; the
+     paragraph's figures come from the Percentages CSV.
+   - Do NOT describe any region in a way its row contradicts.
 
    Include:
    - Modeled extent (km²), from extent_area_km2.
    - Area carrying data (km²), from valid_area_km2, whenever it differs from
      extent_area_km2.
    - Areas and percentages of positive and negative trends, from the CSV.
-   - Geographic distribution of the areas showing positive and negative trends.
-   - Important positive and negative trend gradients if they exist.
+   - Where positive and negative trends lie, from the Regions CSV as above.
+   - Important gradients, from the same table, if they exist.
    - STRICTLY descriptive. No ecological or conservation interpretation.
    - Provide relative spatial descriptions using cardinal directions rather than lat/lon.
 
 
-   **Paragraph 2: Based on the Suitability-Change-Trend-Percentages.csv and Suitability-Change-Trend.tif files**
+   **Paragraph 2: Based on the Suitability-Change-Trend-Percentages.csv and Suitability-Change-Trend-Regions.csv files**
    
    Range-wide Suitability Change Trend (Heading 3)
 
-   This raster is the Theil-Sen trend in successive changes in suitability
+   The change trend is the Theil-Sen trend in successive changes in suitability
    across 1980–2020. Each change is a later suitability minus an earlier one.
-   Consistently use this interpretation of the raster values:
+   Consistently use this interpretation of its values:
    - Positive: successive changes grew more positive. Gains strengthened or
      losses eased.
    - Negative: successive changes grew more negative. Gains faded or losses
@@ -259,12 +275,29 @@ CLIMATIC SUITABILITY (Heading 1)
    Use the same denominator wording as Paragraph 1, so the two paragraphs
    are comparable.
 
-   Use the raster ONLY for where things are, never for how much.
+   WHERE. Suitability-Change-Trend-Regions.csv divides the extent into nine
+   regions, thirds of its east-west and north-south span: northwest,
+   north, northeast, west, central, east, southwest, south, southeast. For
+   each it gives the area carrying data, the share of that area where
+   successive changes grew more positive
+   (percent_positive) and the median change trend (median_value).
+   Describe where positive and negative values lie ONLY from this table.
+   - Above 50 percent positive: mostly growing more positive. Below 50: mostly
+     growing more negative. Within a few points of 50: mixed.
+   - You MUST name the region with the lowest percent_positive and the
+     region with the highest, using these region names or their adjective
+     forms (southeastern, central).
+   - The strongest positive and negative values are where median_value is
+     largest and smallest. A gradient is a large step in median_value
+     between adjacent regions.
+   - Do NOT quote the regional figures. They locate the pattern; the
+     paragraph's figures come from the Percentages CSV.
+   - Do NOT describe any region in a way its row contradicts.
 
    Include:
    - Areas and percentages of positive and negative change trend, from the CSV.
-   - Geographic distribution of the positive and negative areas.
-   - Important gradients between them if they exist.
+   - Where the positive and negative areas lie, from the Regions CSV as above.
+   - Important gradients, from the same table, if they exist.
    - Report both shares, but do NOT describe either sign as prevailing,
      dominant or the overall direction of change. Across runs at different
      seeds the range-wide balance of the change trend reverses for most
@@ -283,33 +316,33 @@ CLIMATIC SUITABILITY (Heading 1)
    - Short summary of these metrics. Give bearing in degrees along with a description of direction, eg northward trajectory, southeasterly movement, etc.
    - STRICTLY descriptive. No ecological interpretation.
 
-   Centroids-Latitude-Summary.csv and Centroids-Longitude-Summary.csv - These files show the Bayesian linear regression results for changes in latitude and longitude respectively across the 1980-2020 span of the study.
+   Centroids-Latitude-Summary.csv and Centroids-Longitude-Summary.csv hold
+   the Bayesian linear regressions of the centroid's latitude and longitude
+   on year. Whether each regression supports a shift has already been
+   determined from these files. The determination is the text below, which
+   you MUST reproduce EXACTLY, character for character, as the last
+   sentence or sentences of this paragraph:
 
-   Include:
-   - Short verbal interpretation of these metrics and a statement regarding the statistical significance of changes in longitude and latitude. DO NOT provide specific values.
+   <centroid_support>
+
+   Do NOT restate the determination in other words, and do NOT give
+   regression values.
    - STRICTLY descriptive. No ecological interpretation.
 
    STATISTICAL SUPPORT RULE (MANDATORY). This rule governs this paragraph
    and EVERY later mention of centroid movement anywhere in the document,
-   including the interpretation paragraphs.
-
-   Determine separately for latitude and for longitude whether the Bayesian
-   credible interval includes zero.
-
-   - Interval EXCLUDES zero. The change is statistically supported.
-     Directional language is permitted: "northward", "a coherent shift",
-     "tracking".
-   - Interval INCLUDES zero. The change is NOT statistically supported. Report
-     the measured displacement, bearing and velocity, and qualify them in the
-     same sentence. Use this construction:
-     "the centroid moved <distance> km on a bearing of <bearing> degrees, a
-     displacement the regression does not distinguish from no change."
-     Do NOT write "coherent", "directional", "tracking", "consistent
-     movement", or any wording implying the trend is established.
-
-   A measured displacement with an interval spanning zero is still worth
-   reporting. It is the claim of direction, not the measurement, that the
-   statistics do not support.
+   including the interpretation paragraphs. Follow the determination above:
+   - An axis it calls statistically supported may be described with
+     directional language: "northward", "a coherent shift", "tracking".
+   - An axis it says the regression does not distinguish from no change
+     must NOT be described as a shift, trend or direction.
+   - The displacement, bearing and velocity are measurements and are always
+     reported. Qualify the displacement as a whole ONLY when the
+     determination says neither axis is supported. Then do NOT write
+     "coherent", "directional", "tracking", "consistent movement", or any
+     wording implying the trend is established.
+   - When either axis is supported, NEVER say the displacement as a whole
+     is not distinguished from no change.
 
    This rule outranks narrative flow. Where it forces an awkward sentence,
    keep the rule.
@@ -636,7 +669,11 @@ CHECK:
 18. Any statement about where decline is gathering pace rests on the hot
     spot figures alone and names the state with the largest hot spot area.
     No passage says decline is easing or slowing anywhere.
-19. No unsubstituted placeholder appears anywhere in the document. Search the
+19. Paragraphs 1 and 2 each name the region with the lowest and the
+    highest percent_positive in their Regions CSV, and describe no region
+    in a way its row contradicts. The supplied centroid determination
+    closes Paragraph 3, word for word.
+20. No unsubstituted placeholder appears anywhere in the document. Search the
     assembled text for "{" before saving. A Python string built with a brace
     placeholder but without the f prefix writes the placeholder literally,
     and where it stands in for a number the report is missing data. Build

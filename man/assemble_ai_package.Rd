@@ -9,12 +9,13 @@ assemble_ai_package(
   files = c("centroids/Bioclimatic-Velocity.csv",
     "centroids/Centroids-Latitude-Summary.csv",
     "centroids/Centroids-Longitude-Summary.csv",
-    "suitability/Suitability-Change-Trend.tif",
     "suitability/Suitability-Change-Trend-Percentages.csv",
+    "suitability/Suitability-Change-Trend-Regions.csv",
     "suitability/Suitability-Trend-Percentages.csv",
+    "suitability/Suitability-Trend-Regions.csv",
     "suitability/Suitability-Trend-Boundary-Statistics.csv",
     "suitability/Suitability-Trend-State-Analysis-Summary.csv",
-    "suitability/Suitability-Trend.tif", "suitability/Species-Information.csv",
+    "suitability/Species-Information.csv",
     "variables/Variable-Contributions-BR-Stats.csv")
 )
 }
@@ -25,7 +26,7 @@ assemble_ai_package(
 \item{files}{Character vector. File paths (without alpha_code prefix)
 identifying which outputs to include in the AI package. All entries
 must include a subdirectory relative to \code{Trends/}, for example:
-\code{"suitability/Suitability-Trend.tif"} or
+\code{"suitability/Suitability-Trend-Regions.csv"} or
 \code{"centroids/Bioclimatic-Velocity.csv"}.
 
 Each file will be resolved as:
@@ -33,7 +34,10 @@ Each file will be resolved as:
   <project_root>/runs/<alpha_code>/Trends/<subdir>/<alpha_code>-<filename>
   }
 
-Defaults to a minimal core set.}
+Defaults to a minimal core set of CSVs. Since v0.2.0 it carries no
+rasters: the narrative takes where trends lie from the two Regions
+CSVs, because a provider reading the GeoTIFFs itself misplaced the
+strongest declines and inverted the change trend's central belt.}
 }
 \value{
 Named list (invisible) with components:
@@ -52,15 +56,15 @@ Named list (invisible) with components:
 }
 }
 \description{
-Collects selected suitability-trend rasters, summary tables, and species
-metadata for a single species, then builds an AI-ready package together
+Collects selected suitability-trend summary tables and species metadata
+for a single species, then builds an AI-ready package together
 with prompt templates and a log entry. The function locates the project
 root via \code{rENM_project_dir()} and does not rely on hard-coded paths.
 }
 \details{
 \strong{Pipeline context}
 \itemize{
-\item Copies selected suitability rasters and tables into a shared
+\item Copies selected summary tables into a shared
 \code{suitability_package/} staging directory.
 \item Creates a \code{.zip} archive of the package contents.
 \item Copies the contents of \code{suitability_package/} and the
@@ -79,7 +83,7 @@ includes it in the package.
 \item Adds flexible file selection via \code{files}.
 \item All files are drawn from subdirectories under \code{Trends/}.
 \item Users must explicitly specify subdirectories (e.g.,
-\code{"suitability/Suitability-Trend.tif"} or
+\code{"suitability/Suitability-Trend-Regions.csv"} or
 \code{"centroids/Bioclimatic-Velocity.csv"}).
 }
 

@@ -1,4 +1,26 @@
 # rENM.ai 0.2.0.9000
+* The AI package no longer carries the two GeoTIFFs. The narrative takes
+  where trends lie from the Regions CSVs that `find_trend_percentages()`
+  now writes: the positive share and median in each ninth of the extent.
+  Reading the rasters itself, ChatGPT placed the strongest declines in the
+  west, missing the southeast, and inverted the change trend's central
+  belt. Both prompts require the regions with the lowest and highest
+  positive share to be named, and `render_ai_docx()` warns when either is
+  missing. On CASP, three ChatGPT narratives and one Claude narrative all
+  described both maps correctly.
+* Which axes of the centroid shift are statistically supported is now
+  decided in R from the two regression summaries and supplied as a sentence
+  the model must copy. `render_ai_docx()` stops if it is altered. ChatGPT
+  had reported a supported northward shift and, in the same paragraph,
+  called the whole displacement indistinguishable from no change.
+* `assemble_ai_package()` rebuilds the staging folder and zip from scratch.
+  `zip()` adds to an existing archive, so a file dropped from `files` stayed
+  in the package.
+* Both prompts take the pace of decline only from the hot-spot figures and
+  name the state with the largest hot-spot area. Claude had called declines
+  in the southeast easing by reading the trend and change-trend maps
+  together, while south Texas held the largest hot-spot area of any state.
+
 * `submit_to_claude()` saves its raw API response, `debug_resp.rds`, in
   `Summaries/claude/` beside the prompt and package rather than at the top
   of the run folder, and deletes it once the DOCX has been downloaded. It
