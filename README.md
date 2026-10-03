@@ -8,7 +8,7 @@
 
 `rENM.ai` integrates generative AI into the rENM workflow to produce structured, publication-quality narrative outputs from modeled and analyzed data products.
 
-This package depends on `rENM.core` for project-directory resolution and species metadata access. All functions accept an optional `project_dir` argument; see `?rENM_project_dir` for configuration options.
+This package depends on `rENM.core` for project-directory resolution and species metadata access. Functions find the project directory through `rENM.core::rENM_project_dir()`; see `?rENM_project_dir` for configuration options.
 
 ## Key functions
 
@@ -18,7 +18,8 @@ This package depends on `rENM.core` for project-directory resolution and species
 | `submit_to_chatgpt()` | Upload data bundle to OpenAI and retrieve a DOCX report |
 | `submit_to_claude()` | Upload data bundle to Anthropic and retrieve a DOCX report |
 | `submit_to_claude_diag()` | Diagnose a failed `submit_to_claude()` response |
-| `render_ai_docx()` | Convert a generated DOCX report to PDF via LibreOffice |
+| `assemble_coversheet()` | Build a plain opening page with no generated text, in place of a narrative |
+| `render_ai_docx()` | Check the opening-page DOCX and convert it to PDF via LibreOffice |
 
 ## System requirements
 
@@ -61,7 +62,8 @@ library(rENM.ai)
 Sys.setenv(ANTHROPIC_API_KEY = "sk-ant-...")
 Sys.setenv(OPENAI_API_KEY    = "sk-...")
 
-proj <- "/path/to/your/rENM/project"
+# set once per session, or set RENM_PROJECT_DIR in ~/.Renviron
+options(rENM.project_dir = "/path/to/your/rENM/project")
 
 # 1. Stage the AI-ready data bundle (runs once per species)
 assemble_ai_package("CASP")
@@ -70,17 +72,8 @@ assemble_ai_package("CASP")
 result <- submit_to_claude("CASP")   # or submit_to_chatgpt("CASP")
 message("Report: ", result$docx_path)
 
-# 3. Convert the DOCX report to PDF
+# 3. Check the DOCX and convert it to PDF
 render_ai_docx("CASP")
-```
-
-For interactive work, configure the project directory once per session:
-
-``` r
-options(rENM.project_dir = "/path/to/your/rENM/project")
-
-assemble_ai_package("CASP")
-submit_to_claude("CASP")
 ```
 
 If no DOCX is produced, use the diagnostic helper:
@@ -102,10 +95,12 @@ submit_to_claude()           <- Anthropic API (Files API + code execution)
   or
 submit_to_chatgpt()          <- OpenAI Responses API (code interpreter)
         ↓
-render_ai_docx()             <- DOCX → PDF via LibreOffice
+render_ai_docx()             <- checks the DOCX, then DOCX → PDF via LibreOffice
 ```
 
-`assemble_ai_package()` writes staged bundles to `<run_dir>/Summaries/claude/` and `<run_dir>/Summaries/chatgpt/`. Generated DOCX reports are written to `<run_dir>/Summaries/pages/`. A debug response snapshot is saved to `<run_dir>/debug_resp.rds` after every `submit_to_claude()` call. All functions append a processing summary to `<run_dir>/_log.txt`.
+Without AI, `assemble_coversheet()` replaces `assemble_ai_package()` and the submission step, and writes the same DOCX for `render_ai_docx()`.
+
+`assemble_ai_package()` writes staged bundles to `<run_dir>/Summaries/claude/` and `<run_dir>/Summaries/chatgpt/`. Generated DOCX reports are written to `<run_dir>/Summaries/pages/`. `submit_to_claude()` saves the raw response to `<run_dir>/Summaries/claude/debug_resp.rds` and keeps it only when no DOCX was retrieved. The pipeline functions append a processing summary to `<run_dir>/_log.txt`.
 
 ## Authentication
 
