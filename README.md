@@ -89,8 +89,8 @@ If no DOCX is produced, use the diagnostic helper:
 # From the return value:
 submit_to_claude_diag(result$response)
 
-# Or from the saved debug file:
-submit_to_claude_diag(readRDS("runs/CASP/debug_resp.rds"))
+# Or from the saved debug file, kept only when no DOCX was retrieved:
+submit_to_claude_diag(readRDS("runs/CASP/Summaries/claude/debug_resp.rds"))
 ```
 
 ## AI pipeline
