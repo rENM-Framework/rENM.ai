@@ -27,6 +27,11 @@
 #'
 #' @param alpha_code Character. Species alpha code, for example \code{"CASP"}.
 #' @param verbose Logical. If \code{TRUE} (default), prints diagnostic messages.
+#' @param narrative Logical. \code{TRUE} (default) when the DOCX is a
+#'   provider narrative. \code{FALSE} for a coversheet from
+#'   \code{assemble_coversheet()}, which skips the prose, region and
+#'   truncation checks: a coversheet has no narrative sections, so those
+#'   checks would report faults that are not there.
 #'
 #' @return Character. Invisibly returns the path to the generated PDF.\cr
 #' Side effects:
@@ -42,7 +47,7 @@
 #' }
 #'
 #' @export
-render_ai_docx <- function(alpha_code, verbose = TRUE) {
+render_ai_docx <- function(alpha_code, verbose = TRUE, narrative = TRUE) {
 
   # -------------------------------------------------------------
   # 1. Normalize
@@ -124,8 +129,12 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
   # Known prose faults, not a general quality judgement. Warns: the report
   # stays readable and every figure is right. A map paragraph that fails to
   # name the region its data single out is reported with them.
-  prose <- c(.check_docx_prose(docx_path),
-             .check_docx_regions(docx_path, .region_extremes(species_dir, code)))
+  # The checks from here to the LibreOffice step read narrative sections, so
+  # a coversheet skips them.
+  prose <- if (narrative) {
+    c(.check_docx_prose(docx_path),
+      .check_docx_regions(docx_path, .region_extremes(species_dir, code)))
+  } else character(0)
   if (length(prose)) {
     warning(
       "Narrative for ", code, " has ", length(prose),
@@ -136,7 +145,7 @@ render_ai_docx <- function(alpha_code, verbose = TRUE) {
     )
   }
 
-  truncated <- .check_docx_paragraphs(docx_path)
+  truncated <- if (narrative) .check_docx_paragraphs(docx_path) else character(0)
   if (length(truncated)) {
     warning(
       "Narrative for ", code, " has ", length(truncated),

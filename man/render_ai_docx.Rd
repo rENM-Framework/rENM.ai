@@ -4,12 +4,18 @@
 \alias{render_ai_docx}
 \title{Render GenAI DOCX report to PDF}
 \usage{
-render_ai_docx(alpha_code, verbose = TRUE)
+render_ai_docx(alpha_code, verbose = TRUE, narrative = TRUE)
 }
 \arguments{
 \item{alpha_code}{Character. Species alpha code, for example \code{"CASP"}.}
 
 \item{verbose}{Logical. If \code{TRUE} (default), prints diagnostic messages.}
+
+\item{narrative}{Logical. \code{TRUE} (default) when the DOCX is a
+provider narrative. \code{FALSE} for a coversheet from
+\code{assemble_coversheet()}, which skips the prose, region and
+truncation checks: a coversheet has no narrative sections, so those
+checks would report faults that are not there.}
 }
 \value{
 Character. Invisibly returns the path to the generated PDF.\cr

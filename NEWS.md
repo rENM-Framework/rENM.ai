@@ -1,4 +1,8 @@
 # rENM.ai 0.2.0.9000
+* `render_ai_docx()` gains `narrative` (default `TRUE`). `rENM()` passes
+  `FALSE` for a coversheet, which skips the prose, region and truncation
+  checks. The region check reported both map headings as missing from
+  every coversheet.
 * The AI package no longer carries the two GeoTIFFs. The narrative takes
   where trends lie from the Regions CSVs that `find_trend_percentages()`
   now writes: the positive share and median in each ninth of the extent.
