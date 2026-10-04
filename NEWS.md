@@ -1,4 +1,6 @@
 # rENM.ai 0.2.0.9000
+* The REPRODUCIBILITY statement says percentages can move by up to about
+  20 points, re-measured on 50 runs of the corrected code (was 10 to 30).
 * `render_ai_docx()` gains `narrative` (default `TRUE`). `rENM()` passes
   `FALSE` for a coversheet, which skips the prose, region and truncation
   checks. The region check reported both map headings as missing from

@@ -49,15 +49,14 @@
   # about two lines, with either provider's model name in the disclosure;
   # the coversheet closes 57 pt above it.
   #
-  # The second paragraph rests on 35 seeded runs of six species (CASP x10;
-  # GRRO, EAME, PIJA, GRWA, GRVI x5), land cells only. The extent's positive
-  # share moved 10 to 31 points across seeds, and its majority sign changed
-  # for PIJA (1 of 5 runs positive) and EAME (4 of 5). The range-wide change
-  # trend's majority sign changed in five species. Centroid bearings held in
-  # every species (mean resultant length 0.97 to 0.99). Hot-spot maps from
-  # two seeds overlapped by 0.16 to 0.38 (Jaccard). Same-interval variable
-  # sets overlapped by 0.38 to 0.65. Six species, so the wording stays
-  # qualitative.
+  # The second paragraph rests on 50 seeded runs of six species on the
+  # code with records clipped to the extent and 1:10 background (CASP, PIJA,
+  # GRWA, GRVI x10; GRRO, EAME x5), land cells only. The extent's positive
+  # share moved 7 to 20 points across seeds; its majority sign changed where
+  # trends sat near 50 (EAME 3 of 5 runs positive; one run each of CASP and
+  # GRWA). Centroid bearings held (mean resultant length 0.88 to 0.99).
+  # Evidence: rENM/dev/revalidation_2026-10-04. Six species, so the wording
+  # stays qualitative.
   body <- c(
     paste0(
       "This report presents one realization of a stochastic pipeline, ",
@@ -70,7 +69,7 @@
     paste0(
       "Results vary between seeds, and finer detail varies more. The ",
       "direction of the range-wide trend and of the centroid shift usually ",
-      "reproduce, but percentages can move by 10 to 30 points, and where ",
+      "reproduce, but percentages can move by up to about 20 points, and where ",
       "trends are weak the majority direction itself can change. The change ",
       "trend, per-state figures and hot spot locations are less stable still. ",
       "Seeds can also select different but correlated variables, so those ",
